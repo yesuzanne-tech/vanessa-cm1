@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Mission Lecture</title>
+<style>
+/* Plan : une page, un seul écran à la fois, gros boutons pour iPad. Palette de blocs (herbe, terre, ciel), texte très lisible. */
+:root {
+  --ciel: #e6f3fb;
+  --herbe: #3f8f2b;
+  --herbe-fonce: #2d6a1e;
+  --terre: #7b5232;
+  --encre: #1d2a1c;
+  --papier: #ffffff;
+  --or: #f1b400;
+  --juste: #2e8b3d;
+  --faux: #c0392b;
+  --police: "Trebuchet MS", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--ciel);
+  color: var(--encre);
+  font-family: var(--police);
+  font-size: 20px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+.bandeau {
+  background: var(--herbe);
+  border-bottom: 8px solid var(--terre);
+  color: #fff;
+  padding: 14px 20px;
+}
+.bandeau-in { max-width: 760px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
+.titre { font-size: 26px; font-weight: bold; letter-spacing: 0.5px; margin: 0; }
+.version { font-size: 13px; opacity: 0.85; }
+main { max-width: 760px; margin: 0 auto; padding: 20px 16px 48px 16px; }
+.carte {
+  background: var(--papier);
+  border: 3px solid var(--terre);
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+h2 { font-size: 24px; margin: 0 0 8px 0; }
+p { margin: 0 0 12px 0; }
+.niveaux { display: -webkit-box; display: -webkit-flex; display: flex; margin: 12px -4px; }
+.bloc {
+  -webkit-box-flex: 1; -webkit-flex: 1; flex: 1; min-width: 0; margin: 0 4px; text-align: center; padding: 10px 4px;
+  border: 3px solid var(--terre); background: #e4dccd; color: #6b5a47; font-weight: bold; border-radius: 4px;
+}
+.bloc.actif { background: var(--herbe); color: #fff; border-color: var(--herbe-fonce); }
+.bloc.passe { background: var(--or); color: var(--encre); border-color: var(--terre); }
+.bouton {
+  display: block; width: 100%; font-family: var(--police); font-size: 22px; font-weight: bold;
+  padding: 16px 18px; margin: 10px 0 0 0; border-radius: 6px; cursor: pointer;
+  border: 3px solid var(--herbe-fonce); background: var(--herbe); color: #fff; text-align: center;
+  -webkit-appearance: none; appearance: none;
+}
+.bouton.second { background: #fff; color: var(--herbe-fonce); }
+.bouton:focus { outline: 4px solid var(--or); outline-offset: 2px; }
+.option {
+  display: block; width: 100%; text-align: left; font-family: var(--police); font-size: 21px;
+  padding: 16px 18px; margin: 10px 0 0 0; border-radius: 6px; cursor: pointer;
+  border: 3px solid var(--terre); background: #fffdf7; color: var(--encre);
+  -webkit-appearance: none; appearance: none;
+}
+.option:focus { outline: 4px solid var(--or); outline-offset: 2px; }
+.option.juste { background: #d8f0da; border-color: var(--juste); }
+.option.faux { background: #f8dcd8; border-color: var(--faux); }
+.texte-histoire {
+  font-size: 22px; line-height: 1.65; background: #fffdf2; border-left: 8px solid var(--or);
+  padding: 14px 16px; border-radius: 4px; margin: 10px 0 0 0;
+}
+.etiquette { display: inline-block; font-size: 15px; font-weight: bold; background: var(--terre); color: #fff; padding: 2px 10px; border-radius: 3px; }
+.suivi { font-size: 16px; color: #4d5b4c; margin-bottom: 6px; }
+.retour { margin-top: 14px; padding: 12px 14px; border-radius: 6px; font-size: 19px; }
+.retour.ok { background: #d8f0da; border: 2px solid var(--juste); }
+.retour.ko { background: #f8dcd8; border: 2px solid var(--faux); }
+.note { font-size: 54px; font-weight: bold; color: var(--herbe-fonce); line-height: 1.1; margin: 4px 0 8px 0; }
+.etoiles { font-size: 36px; color: var(--or); letter-spacing: 4px; margin-bottom: 6px; }
+textarea {
+  width: 100%; font-family: var(--police); font-size: 20px; padding: 12px; border: 3px solid var(--terre);
+  border-radius: 6px; background: #fffdf7; color: var(--encre); min-height: 110px;
+}
+textarea:focus { outline: 4px solid var(--or); outline-offset: 2px; }
+.liste { margin: 0; padding-left: 22px; font-size: 18px; }
+.petit { font-size: 16px; color: #4d5b4c; }
+.bilan { font-size: 15px; min-height: 280px; font-family: "Courier New", monospace; }
+</style>
+</head>
+<body>
+<div class="bandeau"><div class="bandeau-in"><h1 class="titre">Mission Lecture</h1><span class="version" id="version"></span></div></div>
+<main id="app"></main>
+
+<script>
+/* Contenu : niveaux 1 à 3. Pour ajouter des textes, on ajoute des éléments dans "texts". */
+var VERSION = "V1 · 24/11/2026";
+var STORE = "lecture_vanessa_v1";
+var VF = ["Vrai", "Faux"];
+
+var LEVELS = [
+  {
+    nom: "Les mots et les phrases",
+    texts: [
+      {
+        id: "1-mc-mine", univers: "Minecraft", titre: "La mine sombre",
+        texte: "Léo arrive dans un grand village de blocs. Il trouve une pioche en fer dans un coffre. Il descend dans une mine sombre pour chercher du charbon. Il allume une torche pour y voir clair.",
+        qs: [
+          { q: "Où Léo trouve-t-il la pioche ?", o: ["Dans un coffre", "Dans une mine", "Dans une maison"], a: 0, why: "« Il trouve une pioche en fer dans un coffre. »" },
+          { q: "Qu'allume-t-il dans la mine ?", o: ["Une torche", "Un feu de camp", "Une lampe"], a: 0, why: "« Il allume une torche pour y voir clair. »" },
+          { q: "Pourquoi descend-il dans la mine ?", o: ["Pour dormir", "Pour chercher du charbon", "Pour nager"], a: 1, why: "« Il descend dans une mine sombre pour chercher du charbon. »" },
+          { q: "Vrai ou faux : la pioche est en bois.", o: VF, a: 1, why: "La pioche est en fer, pas en bois." },
+          { q: "« Une mine sombre » veut dire :", o: ["une mine pleine de lumière", "une mine peu éclairée", "une mine très petite"], a: 1, why: "Sombre veut dire qu'il y a peu de lumière. C'est pour ça que Léo allume une torche." }
+        ],
+        ecrit: "Écris une phrase : pourquoi Léo allume-t-il une torche ?"
+      },
+      {
+        id: "1-mc-loup", univers: "Minecraft", titre: "Le petit loup",
+        texte: "Dans la plaine, Emma entend un aboiement. Un petit loup blanc est caché derrière un arbre. Elle lui donne un os pour le rassurer. Maintenant, le loup la suit partout.",
+        qs: [
+          { q: "Où est caché le petit loup ?", o: ["Dans une grotte", "Derrière un arbre", "Sur une colline"], a: 1, why: "« Un petit loup blanc est caché derrière un arbre. »" },
+          { q: "Que donne Emma au loup ?", o: ["De la viande", "Du pain", "Un os"], a: 2, why: "« Elle lui donne un os. »" },
+          { q: "Pourquoi Emma lui donne-t-elle un os ?", o: ["Pour jouer", "Pour le rassurer", "Pour le punir"], a: 1, why: "« Elle lui donne un os pour le rassurer. »" },
+          { q: "Vrai ou faux : le loup est noir.", o: VF, a: 1, why: "Le texte dit « un petit loup blanc »." },
+          { q: "« Il la suit partout » veut dire :", o: ["il se cache d'elle", "il va avec elle partout", "il court plus vite qu'elle"], a: 1, why: "Suivre quelqu'un, c'est aller derrière lui, avec lui." }
+        ],
+        ecrit: "Écris une phrase : que fait le loup à la fin ?"
+      },
+      {
+        id: "1-pk-feu", univers: "Pokémon", titre: "Le Pokémon qui dort",
+        texte: "Chloé cherche son Pokémon dans le jardin. Il dort sous un buisson, roulé en boule. Sa queue brille comme une petite flamme. Chloé le réveille doucement avec une caresse.",
+        qs: [
+          { q: "Où dort le Pokémon ?", o: ["Sous un buisson", "Dans un arbre", "Dans la maison"], a: 0, why: "« Il dort sous un buisson. »" },
+          { q: "Comment dort-il ?", o: ["Allongé sur le dos", "Debout", "Roulé en boule"], a: 2, why: "« Il dort sous un buisson, roulé en boule. »" },
+          { q: "À quoi ressemble sa queue ?", o: ["À une feuille", "À une petite flamme", "À une plume"], a: 1, why: "« Sa queue brille comme une petite flamme. »" },
+          { q: "Vrai ou faux : Chloé réveille son Pokémon en criant.", o: VF, a: 1, why: "Chloé le réveille doucement, avec une caresse." },
+          { q: "« Doucement » veut dire :", o: ["très fort", "avec douceur", "très vite"], a: 1, why: "Doucement, c'est le contraire de brutalement." }
+        ],
+        ecrit: "Écris une phrase : où Chloé cherche-t-elle son Pokémon ?"
+      }
+    ]
+  },
+  {
+    nom: "Retrouver l'information",
+    texts: [
+      {
+        id: "2-mc-village", univers: "Minecraft", titre: "Le village au bord de la rivière",
+        texte: "Hugo marche depuis deux heures quand il aperçoit un village au bord d'une rivière. Les maisons sont en bois et leurs toits sont rouges. Devant la boulangerie, une villageoise vend du pain contre des émeraudes. Hugo n'en a pas, mais il a des carottes dans son sac. Il propose un échange. La villageoise accepte et lui donne trois pains. Hugo mange un pain tout de suite et garde les deux autres pour le soir.",
+        qs: [
+          { q: "Depuis combien de temps Hugo marche-t-il ?", o: ["Une heure", "Deux heures", "Trois heures"], a: 1, why: "« Hugo marche depuis deux heures. »" },
+          { q: "De quelle couleur sont les toits ?", o: ["Rouges", "Bleus", "Verts"], a: 0, why: "« Leurs toits sont rouges. »" },
+          { q: "Que propose Hugo à la villageoise ?", o: ["De travailler pour elle", "Un échange", "De lui donner des émeraudes"], a: 1, why: "« Il propose un échange » : ses carottes contre du pain." },
+          { q: "Combien de pains Hugo garde-t-il pour le soir ?", o: ["Un", "Trois", "Deux"], a: 2, why: "Il reçoit trois pains, en mange un, et garde les deux autres." },
+          { q: "Vrai ou faux : Hugo paie avec des émeraudes.", o: VF, a: 1, why: "« Hugo n'en a pas, mais il a des carottes. » Il paie avec des carottes." }
+        ],
+        ecrit: "Écris une phrase : qu'est-ce que Hugo donne à la villageoise ?"
+      },
+      {
+        id: "2-pk-lac", univers: "Pokémon", titre: "L'entraînement au lac",
+        texte: "Tous les samedis, Nora s'entraîne avec son Pokémon d'eau près du lac. Elle lance un ballon en l'air et le Pokémon le renvoie avec un jet d'eau. Aujourd'hui, elle réussit dix fois de suite. Son entraîneur, monsieur Duval, la félicite et lui offre une baie bleue. Nora la partage avec son Pokémon. Ils rentrent ensuite à la maison, fatigués mais contents.",
+        qs: [
+          { q: "Quel jour Nora s'entraîne-t-elle ?", o: ["Tous les dimanches", "Tous les samedis", "Tous les mercredis"], a: 1, why: "« Tous les samedis, Nora s'entraîne. »" },
+          { q: "Où s'entraîne-t-elle ?", o: ["Près du lac", "Dans la forêt", "Sur la plage"], a: 0, why: "« Près du lac. »" },
+          { q: "Combien de fois réussit-elle aujourd'hui ?", o: ["Cinq fois", "Vingt fois", "Dix fois"], a: 2, why: "« Elle réussit dix fois de suite. »" },
+          { q: "Qui la félicite ?", o: ["Sa mère", "Son Pokémon", "Monsieur Duval"], a: 2, why: "« Son entraîneur, monsieur Duval, la félicite. »" },
+          { q: "Vrai ou faux : Nora garde la baie pour elle toute seule.", o: VF, a: 1, why: "« Nora la partage avec son Pokémon. »" }
+        ],
+        ecrit: "Écris une phrase : comment se sentent Nora et son Pokémon à la fin ?"
+      },
+      {
+        id: "2-ml-colis", univers: "Miraculous", titre: "Le mystérieux colis",
+        texte: "Ce matin, Camille trouve un petit colis devant la porte de sa chambre. Il est enveloppé dans du papier vert avec des étoiles dorées. À l'intérieur, il y a une boucle d'oreille brillante et un mot écrit à la main. Le mot dit : « Garde-la précieusement, elle te sera utile. » Camille ne sait pas qui lui a laissé ce cadeau. Elle décide de le cacher dans sa boîte à bijoux, au fond de son armoire.",
+        qs: [
+          { q: "Où Camille trouve-t-elle le colis ?", o: ["Dans son sac", "Devant la porte de sa chambre", "Dans la cuisine"], a: 1, why: "« Devant la porte de sa chambre. »" },
+          { q: "Comment est le papier du colis ?", o: ["Vert avec des étoiles dorées", "Rouge avec des pois", "Bleu avec des rayures"], a: 0, why: "« Du papier vert avec des étoiles dorées. »" },
+          { q: "Qu'y a-t-il dans le colis ?", o: ["Un collier et une clé", "Un livre et un stylo", "Une boucle d'oreille et un mot"], a: 2, why: "« Une boucle d'oreille brillante et un mot écrit à la main. »" },
+          { q: "Camille sait-elle qui a laissé le cadeau ?", o: ["Oui, sa voisine", "Non, elle ne le sait pas", "Oui, sa mère"], a: 1, why: "« Camille ne sait pas qui lui a laissé ce cadeau. »" },
+          { q: "Où cache-t-elle le cadeau ?", o: ["Sous son lit", "Dans son sac", "Dans sa boîte à bijoux"], a: 2, why: "« Elle décide de le cacher dans sa boîte à bijoux. »" }
+        ],
+        ecrit: "Écris une phrase : que dit le mot qui est dans le colis ?"
+      }
+    ]
+  },
+  {
+    nom: "Comprendre toute l'histoire",
+    texts: [
+      {
+        id: "3-mc-pont", univers: "Minecraft", titre: "Le pont au-dessus du ravin",
+        texte: "Sacha et sa sœur Inès veulent traverser un large ravin pour rejoindre une forêt de bouleaux. D'abord, ils essaient de sauter, mais le trou est beaucoup trop grand. Ensuite, Sacha propose de construire un pont avec des blocs de pierre. Inès ramasse des pierres dans la montagne pendant que Sacha pose les blocs un par un. Au milieu du pont, un squelette apparaît et leur tire des flèches. Inès sort son bouclier pour protéger son frère. Après un long moment, le pont est enfin terminé. Les deux enfants le traversent en courant et arrivent dans la forêt, fatigués mais fiers.",
+        qs: [
+          { q: "Quel est le bon ordre des événements ?", o: [
+              "Un squelette apparaît, ils essaient de sauter, ils construisent le pont, ils traversent.",
+              "Ils essaient de sauter, ils construisent le pont, un squelette apparaît, ils traversent.",
+              "Ils construisent le pont, ils essaient de sauter, ils traversent, un squelette apparaît."
+            ], a: 1, why: "D'abord ils essaient de sauter, ensuite ils construisent le pont, le squelette arrive au milieu, puis ils traversent." },
+          { q: "Qui sont Sacha et Inès ?", o: ["Deux amis de classe", "Un frère et une sœur", "Deux voisins"], a: 1, why: "« Sacha et sa sœur Inès » : ils sont frère et sœur." },
+          { q: "Pourquoi ne peuvent-ils pas sauter par-dessus le ravin ?", o: ["Parce que le trou est beaucoup trop grand", "Parce qu'ils ont peur", "Parce qu'il pleut"], a: 0, why: "« Ils essaient de sauter, mais le trou est beaucoup trop grand. »" },
+          { q: "Qui protège Sacha quand le squelette attaque ?", o: ["Un villageois", "Un chien", "Inès, avec son bouclier"], a: 2, why: "« Inès sort son bouclier pour protéger son frère. »" },
+          { q: "Quel est le meilleur résumé de l'histoire ?", o: [
+              "Deux enfants se promènent dans la montagne et ramassent des pierres.",
+              "Un squelette attaque deux enfants dans une forêt de bouleaux.",
+              "Deux enfants construisent un pont pour traverser un ravin malgré un squelette, puis arrivent dans la forêt."
+            ], a: 2, why: "Le bon résumé dit l'essentiel : le but (traverser), le problème (le squelette) et la fin (la forêt)." }
+        ],
+        ecrit: "Écris deux phrases pour résumer l'histoire avec tes mots."
+      },
+      {
+        id: "3-pk-plage", univers: "Pokémon", titre: "La tempête sur la plage",
+        texte: "Lucas passe ses vacances au bord de la mer avec son Pokémon, un petit oiseau de vent nommé Zéphyr. Un après-midi, le ciel devient très sombre et le vent se lève. Sur la plage, les touristes rangent vite leurs parasols. Soudain, Lucas voit un enfant courir derrière son chapeau, emporté par le vent tout près des vagues. Zéphyr s'envole, attrape le chapeau avec ses pattes et le rapporte à l'enfant. L'enfant sourit et remercie Lucas. Quelques minutes plus tard, la pluie commence à tomber et tout le monde rentre à l'abri.",
+        qs: [
+          { q: "Quel est le bon ordre des événements ?", o: [
+              "La pluie tombe, le ciel devient sombre, le chapeau s'envole, Zéphyr le rapporte.",
+              "Le chapeau s'envole, le ciel devient sombre, Zéphyr le rapporte, la pluie tombe.",
+              "Le ciel devient sombre, le chapeau s'envole, Zéphyr le rapporte, la pluie tombe."
+            ], a: 2, why: "Le ciel s'assombrit d'abord, puis le chapeau s'envole, Zéphyr le rapporte, et la pluie arrive à la fin." },
+          { q: "Où se passe l'histoire ?", o: ["À la montagne", "Sur une plage, au bord de la mer", "Dans une ville"], a: 1, why: "« Au bord de la mer », « sur la plage », « les vagues » : on est sur une plage." },
+          { q: "Qui est Zéphyr ?", o: ["Le frère de Lucas", "Un touriste", "Le Pokémon de Lucas"], a: 2, why: "« Son Pokémon, un petit oiseau de vent nommé Zéphyr. »" },
+          { q: "Pourquoi les touristes rangent-ils leurs parasols ?", o: ["Parce qu'il fait trop chaud", "Parce que le vent se lève", "Parce qu'ils rentrent dîner"], a: 1, why: "« Le ciel devient très sombre et le vent se lève. » Le vent peut emporter les parasols." },
+          { q: "Quel est le meilleur résumé de l'histoire ?", o: [
+              "Lucas perd son chapeau pendant une tempête.",
+              "Des touristes fuient la plage à cause d'un Pokémon sauvage.",
+              "Pendant une tempête sur la plage, le Pokémon de Lucas rattrape le chapeau d'un enfant."
+            ], a: 2, why: "Le bon résumé parle de Zéphyr qui sauve le chapeau d'un enfant pendant la tempête." }
+        ],
+        ecrit: "Écris deux phrases pour résumer l'histoire avec tes mots."
+      },
+      {
+        id: "3-ml-heroine", univers: "Miraculous", titre: "L'héroïne du balcon",
+        texte: "Chaque soir, Théo regarde la ville depuis son balcon. Ce soir-là, il aperçoit une silhouette qui saute de toit en toit. C'est une héroïne masquée, mais l'un de ses talons est cassé. Elle atterrit sur le balcon de Théo et lui demande de l'aide. Théo lui prête du ruban adhésif. Elle répare son talon en quelques secondes, le remercie et repart. Avant de disparaître, elle lui glisse : « Surtout, ne dis à personne que tu m'as vue ! » Théo promet de garder le secret.",
+        qs: [
+          { q: "Quel est le bon ordre des événements ?", o: [
+              "Il aperçoit une silhouette, elle atterrit sur son balcon, il lui prête du ruban, elle repart.",
+              "Elle repart, il lui prête du ruban, elle atterrit sur son balcon, il aperçoit une silhouette.",
+              "Il lui prête du ruban, il aperçoit une silhouette, elle atterrit sur son balcon, elle repart."
+            ], a: 0, why: "Théo voit d'abord la silhouette, elle atterrit, il l'aide, puis elle repart." },
+          { q: "Où se passe la rencontre ?", o: ["Dans une école", "Sur le balcon de Théo", "Dans un parc"], a: 1, why: "« Elle atterrit sur le balcon de Théo. »" },
+          { q: "Qu'est-ce qui est cassé ?", o: ["Son masque", "Sa montre", "Un de ses talons"], a: 2, why: "« L'un de ses talons est cassé. »" },
+          { q: "Pourquoi l'héroïne demande-t-elle à Théo de ne rien dire ?", o: ["Parce qu'elle veut rester secrète", "Parce qu'elle est fâchée", "Parce qu'elle veut devenir célèbre"], a: 0, why: "Elle est masquée et dit : « ne dis à personne que tu m'as vue ». Elle veut garder son identité secrète." },
+          { q: "Quel est le meilleur résumé de l'histoire ?", o: [
+              "Théo devient un héros et saute de toit en toit.",
+              "Théo casse le talon d'une héroïne.",
+              "Une héroïne masquée demande de l'aide à Théo pour réparer son talon, puis lui demande de garder le secret."
+            ], a: 2, why: "Le bon résumé contient le problème (le talon), l'aide de Théo et le secret." }
+        ],
+        ecrit: "Écris deux phrases pour résumer l'histoire avec tes mots."
+      }
+    ]
+  }
+];
+
+/* ---------- Progression ---------- */
+function defaultState() {
+  return { level: 1, streak: 0, pos: { "1": 0, "2": 0, "3": 0 }, history: [] };
+}
+function loadState() {
+  try {
+    var s = window.localStorage.getItem(STORE);
+    if (s) {
+      var o = JSON.parse(s);
+      if (o && o.level && o.pos && o.history) { return o; }
+    }
+  } catch (e) {}
+  return defaultState();
+}
+function saveState() {
+  try { window.localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {}
+}
+var state = loadState();
+var cur = null;
+
+/* ---------- Outils ---------- */
+var app = document.getElementById("app");
+document.getElementById("version").textContent = VERSION;
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function today() {
+  var d = new Date();
+  var j = d.getDate(); var m = d.getMonth() + 1;
+  return (j < 10 ? "0" + j : j) + "/" + (m < 10 ? "0" + m : m) + "/" + d.getFullYear();
+}
+function blocsNiveaux() {
+  var h = '<div class="niveaux">';
+  for (var i = 1; i <= LEVELS.length; i++) {
+    var c = "bloc";
+    if (i < state.level) { c += " passe"; }
+    if (i === state.level) { c += " actif"; }
+    h += '<div class="' + c + '">Niveau ' + i + '</div>';
+  }
+  return h + '</div>';
+}
+function bind(id, fn) {
+  var el = document.getElementById(id);
+  if (el) { el.addEventListener("click", fn); }
+}
+function go(html) {
+  app.innerHTML = html;
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Écrans ---------- */
+function showHome() {
+  var lv = LEVELS[state.level - 1];
+  var reste = 2 - state.streak;
+  var h = '<div class="carte">';
+  h += '<h2>Salut Vanessa !</h2>';
+  h += '<p>Ta mission : lire un petit texte et répondre à 5 questions. Avec 8 sur 10 ou plus, deux fois de suite, tu montes d\'un niveau.</p>';
+  h += blocsNiveaux();
+  h += '<p><strong>Niveau ' + state.level + ' : ' + esc(lv.nom) + '</strong></p>';
+  h += '<p class="petit">Encore ' + reste + ' réussite' + (reste > 1 ? "s" : "") + ' à 8/10 ou plus pour monter.</p>';
+  h += '<button class="bouton" id="b-start">Commencer la mission</button>';
+  h += '</div>';
+  var n = state.history.length;
+  if (n > 0) {
+    h += '<div class="carte"><h2>Mes derniers résultats</h2><ul class="liste">';
+    for (var i = n - 1; i >= 0 && i >= n - 3; i--) {
+      var e = state.history[i];
+      h += '<li>' + esc(e.t) + ' : ' + e.s + '/10</li>';
+    }
+    h += '</ul></div>';
+  }
+  h += '<button class="bouton second" id="b-bilan">Bilan pour maman</button>';
+  go(h);
+  bind("b-start", startExercise);
+  bind("b-bilan", showBilan);
+}
+
+function startExercise() {
+  var lv = LEVELS[state.level - 1];
+  var idx = state.pos[String(state.level)] % lv.texts.length;
+  cur = { t: lv.texts[idx], qi: 0, score: 0, wrong: [], written: "", lvl: state.level };
+  showQuestion();
+}
+
+function showQuestion() {
+  var t = cur.t;
+  var q = t.qs[cur.qi];
+  var h = '<div class="carte">';
+  h += '<span class="etiquette">' + esc(t.univers) + '</span>';
+  h += '<h2 style="margin-top:10px">' + esc(t.titre) + '</h2>';
+  h += '<div class="texte-histoire">' + esc(t.texte) + '</div>';
+  h += '</div>';
+  h += '<div class="carte">';
+  h += '<div class="suivi">Question ' + (cur.qi + 1) + ' sur ' + t.qs.length + '</div>';
+  h += '<h2>' + esc(q.q) + '</h2>';
+  for (var i = 0; i < q.o.length; i++) {
+    h += '<button class="option" id="o' + i + '">' + esc(q.o[i]) + '</button>';
+  }
+  h += '<div id="retour"></div>';
+  h += '</div>';
+  go(h);
+  var locked = false;
+  function choose(i) {
+    if (locked) { return; }
+    locked = true;
+    var ok = (i === q.a);
+    if (ok) { cur.score += 2; } else { cur.wrong.push(cur.qi + 1); }
+    for (var k = 0; k < q.o.length; k++) {
+      var b = document.getElementById("o" + k);
+      if (k === q.a) { b.className = "option juste"; }
+      else if (k === i) { b.className = "option faux"; }
+    }
+    var r = document.getElementById("retour");
+    var last = (cur.qi === t.qs.length - 1);
+    var m;
+    if (ok) {
+      m = '<div class="retour ok"><strong>Bravo !</strong> ' + esc(q.why) + '</div>';
+    } else {
+      m = '<div class="retour ko"><strong>Pas tout à fait.</strong> Voici l\'indice dans le texte : ' + esc(q.why) + '</div>';
+    }
+    m += '<button class="bouton" id="b-next">' + (last ? "Continuer" : "Question suivante") + '</button>';
+    r.innerHTML = m;
+    bind("b-next", function () {
+      if (last) { showWritten(); } else { cur.qi++; showQuestion(); }
+    });
+  }
+  for (var j = 0; j < q.o.length; j++) {
+    (function (n) { bind("o" + n, function () { choose(n); }); })(j);
+  }
+}
+
+function showWritten() {
+  var h = '<div class="carte">';
+  h += '<h2>Dernière étape</h2>';
+  h += '<p>' + esc(cur.t.ecrit) + '</p>';
+  h += '<p class="petit">Fais une phrase complète : une majuscule au début et un point à la fin. Cette réponse n\'est pas notée, maman la lira.</p>';
+  h += '<textarea id="ecrit" aria-label="Ta réponse"></textarea>';
+  h += '<button class="bouton" id="b-fin">Terminer le texte</button>';
+  h += '</div>';
+  go(h);
+  bind("b-fin", function () {
+    cur.written = document.getElementById("ecrit").value;
+    finish();
+  });
+}
+
+function finish() {
+  var s = cur.score;
+  var avant = state.level;
+  if (s >= 8) { state.streak++; } else { state.streak = 0; }
+  var monte = false, termine = false;
+  if (state.streak >= 2) {
+    if (state.level < LEVELS.length) { state.level++; state.streak = 0; monte = true; }
+    else { termine = true; }
+  }
+  state.pos[String(avant)] = state.pos[String(avant)] + 1;
+  state.history.push({ d: today(), lvl: avant, id: cur.t.id, t: cur.t.titre, s: s, w: cur.wrong, e: cur.written });
+  if (state.history.length > 60) { state.history = state.history.slice(state.history.length - 60); }
+  saveState();
+  showResult(s, monte, termine);
+}
+
+function showResult(s, monte, termine) {
+  var etoiles = s >= 10 ? "★★★" : (s >= 8 ? "★★☆" : (s >= 6 ? "★☆☆" : "☆☆☆"));
+  var msg;
+  if (s >= 8) { msg = "Excellent travail !"; }
+  else if (s >= 6) { msg = "C'est bien. Encore un petit effort et tu y es."; }
+  else { msg = "On s'entraîne encore avec un autre texte du même niveau. Relis bien le texte avant de répondre."; }
+  var h = '<div class="carte" style="text-align:center">';
+  h += '<div class="etoiles">' + etoiles + '</div>';
+  h += '<div class="note">' + s + ' / 10</div>';
+  h += '<p>' + msg + '</p>';
+  if (monte) {
+    h += '<p><strong>Bravo, tu passes au niveau ' + state.level + ' : ' + esc(LEVELS[state.level - 1].nom) + ' !</strong></p>';
+  } else if (termine) {
+    h += '<p><strong>Tu as réussi le dernier niveau disponible.</strong> De nouveaux textes arrivent bientôt.</p>';
+  } else if (s >= 8) {
+    h += '<p>Encore une réussite à 8/10 ou plus pour monter d\'un niveau.</p>';
+  }
+  h += '<button class="bouton" id="b-suite">Texte suivant</button>';
+  h += '<button class="bouton second" id="b-acc">Retour à l\'accueil</button>';
+  h += '</div>';
+  go(h);
+  bind("b-suite", startExercise);
+  bind("b-acc", showHome);
+}
+
+/* ---------- Bilan pour l'adulte ---------- */
+function bilanTexte() {
+  var l = [];
+  l.push("BILAN LECTURE - Vanessa (" + VERSION + ")");
+  l.push("Date du bilan : " + today());
+  l.push("Niveau actuel : " + state.level + " (" + LEVELS[state.level - 1].nom + ")");
+  l.push("Réussites de suite à 8/10 ou plus : " + state.streak + " sur 2");
+  l.push("Derniers exercices :");
+  var n = state.history.length;
+  if (n === 0) { l.push("(aucun exercice fait pour l'instant)"); }
+  for (var i = Math.max(0, n - 10); i < n; i++) {
+    var e = state.history[i];
+    var ligne = "- " + e.d + " | Niveau " + e.lvl + " | " + e.t + " | " + e.s + "/10";
+    if (e.w && e.w.length) { ligne += " | erreurs aux questions : " + e.w.join(", "); }
+    if (e.e) { ligne += " | phrase écrite : " + e.e.replace(/\s+/g, " "); }
+    l.push(ligne);
+  }
+  return l.join("\n");
+}
+
+function showBilan() {
+  var h = '<div class="carte">';
+  h += '<h2>Bilan pour maman</h2>';
+  h += '<p class="petit">Copie ce texte et colle-le dans la conversation avec Claude. Il prépare la prochaine version des exercices.</p>';
+  h += '<textarea id="bilan" class="bilan" readonly aria-label="Bilan à copier"></textarea>';
+  h += '<button class="bouton" id="b-copy">Copier le bilan</button>';
+  h += '<p class="petit" id="copie-msg"></p>';
+  h += '<button class="bouton second" id="b-retour">Retour</button>';
+  h += '<button class="bouton second" id="b-reset">Effacer toute la progression</button>';
+  h += '<div id="reset-zone"></div>';
+  h += '</div>';
+  go(h);
+  var ta = document.getElementById("bilan");
+  ta.value = bilanTexte();
+  bind("b-retour", showHome);
+  bind("b-copy", function () {
+    var msg = document.getElementById("copie-msg");
+    var done = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(ta.value).then(function () { msg.textContent = "Copié."; }, function () { fallback(); });
+        done = true;
+      }
+    } catch (e) {}
+    if (!done) { fallback(); }
+    function fallback() {
+      try {
+        ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
+        var ok = document.execCommand("copy");
+        msg.textContent = ok ? "Copié." : "Le texte est sélectionné : appuie dessus et choisis Copier.";
+      } catch (e2) {
+        msg.textContent = "Le texte est sélectionné : appuie dessus et choisis Copier.";
+      }
+    }
+  });
+  bind("b-reset", function () {
+    var z = document.getElementById("reset-zone");
+    z.innerHTML = '<div class="retour ko"><p>Tout sera effacé : niveau, scores et phrases écrites. Cette action est définitive.</p><button class="bouton" id="b-reset-ok" style="background:#c0392b;border-color:#8e281d">Oui, tout effacer</button><button class="bouton second" id="b-reset-non">Non, garder</button></div>';
+    bind("b-reset-ok", function () { state = defaultState(); saveState(); showHome(); });
+    bind("b-reset-non", function () { z.innerHTML = ""; });
+  });
+}
+
+showHome();
+</script>
+</body>
+</html>
