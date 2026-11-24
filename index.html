@@ -100,7 +100,7 @@ textarea:focus { outline: 4px solid var(--or); outline-offset: 2px; }
 
 <script>
 /* Contenu : niveaux 1 à 3. Pour ajouter des textes, on ajoute des éléments dans "texts". */
-var VERSION = "V1 · 24/11/2026";
+var VERSION = "V2 · 24/11/2026";
 var STORE = "lecture_vanessa_v1";
 var VF = ["Vrai", "Faux"];
 
@@ -326,9 +326,11 @@ function showHome() {
     }
     h += '</ul></div>';
   }
+  h += '<button class="bouton second" id="b-prof">Message de mon professeur</button>';
   h += '<button class="bouton second" id="b-bilan">Bilan pour maman</button>';
   go(h);
   bind("b-start", startExercise);
+  bind("b-prof", showProf);
   bind("b-bilan", showBilan);
 }
 
@@ -390,7 +392,8 @@ function showWritten() {
   var h = '<div class="carte">';
   h += '<h2>Dernière étape</h2>';
   h += '<p>' + esc(cur.t.ecrit) + '</p>';
-  h += '<p class="petit">Fais une phrase complète : une majuscule au début et un point à la fin. Cette réponse n\'est pas notée, maman la lira.</p>';
+  h += '<p class="petit"><strong>Tu peux parler :</strong> touche le petit micro du clavier de l\'iPad et dis ta phrase. Relis-la ensuite et corrige si besoin.</p>';
+  h += '<p class="petit">Fais une phrase complète : une majuscule au début et un point à la fin. Cette réponse n\'est pas notée, ton professeur la lira.</p>';
   h += '<textarea id="ecrit" aria-label="Ta réponse"></textarea>';
   h += '<button class="bouton" id="b-fin">Terminer le texte</button>';
   h += '</div>';
@@ -411,7 +414,7 @@ function finish() {
     else { termine = true; }
   }
   state.pos[String(avant)] = state.pos[String(avant)] + 1;
-  state.history.push({ d: today(), lvl: avant, id: cur.t.id, t: cur.t.titre, s: s, w: cur.wrong, e: cur.written });
+  state.history.push({ d: today(), lvl: avant, id: cur.t.id, t: cur.t.titre, s: s, w: cur.wrong, e: cur.written, q: cur.t.ecrit });
   if (state.history.length > 60) { state.history = state.history.slice(state.history.length - 60); }
   saveState();
   showResult(s, monte, termine);
@@ -434,10 +437,12 @@ function showResult(s, monte, termine) {
   } else if (s >= 8) {
     h += '<p>Encore une réussite à 8/10 ou plus pour monter d\'un niveau.</p>';
   }
-  h += '<button class="bouton" id="b-suite">Texte suivant</button>';
+  h += '<button class="bouton" id="b-envoi">Envoyer ma réponse à mon professeur</button>';
+  h += '<button class="bouton second" id="b-suite">Texte suivant</button>';
   h += '<button class="bouton second" id="b-acc">Retour à l\'accueil</button>';
   h += '</div>';
   go(h);
+  bind("b-envoi", showEnvoi);
   bind("b-suite", startExercise);
   bind("b-acc", showHome);
 }
@@ -503,6 +508,108 @@ function showBilan() {
     bind("b-reset-ok", function () { state = defaultState(); saveState(); showHome(); });
     bind("b-reset-non", function () { z.innerHTML = ""; });
   });
+}
+
+/* ---------- Envoi de la réponse et message du professeur ---------- */
+function envoiTexte() {
+  var n = state.history.length;
+  var l = [];
+  l.push("MESSAGE DE VANESSA POUR SON PROFESSEUR (" + VERSION + ")");
+  l.push("Date : " + today());
+  if (n === 0) { l.push("(aucun exercice terminé)"); return l.join("\n"); }
+  var e = state.history[n - 1];
+  l.push("Niveau " + e.lvl + " | " + e.t + " | " + e.s + "/10");
+  l.push("Erreurs aux questions : " + ((e.w && e.w.length) ? e.w.join(", ") : "aucune"));
+  l.push("Question : " + (e.q || ""));
+  l.push("Réponse de Vanessa (dictée ou écrite) : " + (e.e ? e.e.replace(/\s+/g, " ") : "(pas de réponse)"));
+  return l.join("\n");
+}
+
+function copyText(ta, msg) {
+  var done = false;
+  function fallback() {
+    try {
+      ta.focus(); ta.select(); ta.setSelectionRange(0, 99999);
+      var ok = document.execCommand("copy");
+      msg.textContent = ok ? "Copié." : "Le texte est sélectionné : appuie dessus et choisis Copier.";
+    } catch (e2) {
+      msg.textContent = "Le texte est sélectionné : appuie dessus et choisis Copier.";
+    }
+  }
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(function () { msg.textContent = "Copié."; }, function () { fallback(); });
+      done = true;
+    }
+  } catch (e) {}
+  if (!done) { fallback(); }
+}
+
+function showEnvoi() {
+  var h = '<div class="carte">';
+  h += '<h2>Envoyer ma réponse</h2>';
+  h += '<p class="petit">Maman copie ce message et le colle dans la conversation avec ton professeur (Claude). Il lira ta réponse et te répondra.</p>';
+  h += '<textarea id="envoi" class="bilan" readonly aria-label="Message à copier"></textarea>';
+  h += '<button class="bouton" id="b-copy2">Copier le message</button>';
+  h += '<p class="petit" id="copie-msg2"></p>';
+  h += '<button class="bouton second" id="b-prof2">Message de mon professeur</button>';
+  h += '<button class="bouton second" id="b-ret2">Retour à l\'accueil</button>';
+  h += '</div>';
+  go(h);
+  var ta = document.getElementById("envoi");
+  ta.value = envoiTexte();
+  bind("b-copy2", function () { copyText(ta, document.getElementById("copie-msg2")); });
+  bind("b-prof2", showProf);
+  bind("b-ret2", showHome);
+}
+
+function parler(text, msgEl) {
+  var synth = window.speechSynthesis;
+  if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+    msgEl.textContent = "Cet iPad ne sait pas lire à voix haute ici. Maman peut te lire le message.";
+    return;
+  }
+  var t = String(text).replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "");
+  if (!t) { msgEl.textContent = "Colle d'abord le message de ton professeur dans la case."; return; }
+  synth.cancel();
+  var voices = synth.getVoices ? synth.getVoices() : [];
+  var fr = null;
+  for (var i = 0; i < voices.length; i++) {
+    if (voices[i].lang && voices[i].lang.toLowerCase().indexOf("fr") === 0) { fr = voices[i]; break; }
+  }
+  var parts = t.match(/[^.!?]+[.!?]*/g) || [t];
+  for (var j = 0; j < parts.length; j++) {
+    var p = parts[j].replace(/^\s+|\s+$/g, "");
+    if (!p) { continue; }
+    var u = new SpeechSynthesisUtterance(p);
+    u.lang = "fr-FR";
+    if (fr) { u.voice = fr; }
+    u.rate = 0.9;
+    synth.speak(u);
+  }
+  msgEl.textContent = fr ? "" : "Si la voix n'est pas en français, maman peut la changer dans les réglages d'accessibilité de l'iPad (Contenu énoncé, Voix).";
+}
+
+function showProf() {
+  var h = '<div class="carte">';
+  h += '<h2>Message de mon professeur</h2>';
+  h += '<p class="petit">Maman colle ici le message de ton professeur. Touche « Écouter » pour l\'entendre.</p>';
+  h += '<textarea id="msgprof" style="font-size:22px;min-height:180px" aria-label="Message du professeur"></textarea>';
+  h += '<button class="bouton" id="b-ecoute">Écouter</button>';
+  h += '<button class="bouton second" id="b-stop">Arrêter</button>';
+  h += '<p class="petit" id="prof-msg"></p>';
+  h += '<button class="bouton second" id="b-ret3">Retour à l\'accueil</button>';
+  h += '</div>';
+  go(h);
+  var ta = document.getElementById("msgprof");
+  var msg = document.getElementById("prof-msg");
+  try { var m = window.localStorage.getItem(STORE + "_msg"); if (m) { ta.value = m; } } catch (e) {}
+  ta.addEventListener("input", function () {
+    try { window.localStorage.setItem(STORE + "_msg", ta.value); } catch (e) {}
+  });
+  bind("b-ecoute", function () { parler(ta.value, msg); });
+  bind("b-stop", function () { try { window.speechSynthesis.cancel(); } catch (e) {} });
+  bind("b-ret3", function () { try { window.speechSynthesis.cancel(); } catch (e) {} showHome(); });
 }
 
 showHome();
