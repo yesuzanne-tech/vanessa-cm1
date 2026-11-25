@@ -91,6 +91,13 @@ textarea {
   width: 100%; font-family: var(--police); font-size: 20px; padding: 12px; border: 3px solid var(--terre);
   border-radius: 6px; background: #fffafd; color: var(--encre); min-height: 110px;
 }
+body.clavier-ouvert { padding-bottom: 60vh; }
+.rep { margin: 8px 0; padding: 8px 0; border-bottom: 1px solid #e3d6e8; line-height: 1.4; }
+details.repli > summary { font-size: 24px; font-weight: bold; cursor: pointer; padding: 6px 0; }
+details.ex { margin: 8px 0; padding: 6px 10px; border: 2px solid #e3d6e8; border-radius: 8px; background: #fff; }
+details.ex summary { cursor: pointer; font-weight: bold; font-size: 17px; padding: 8px 0; }
+.statgrille { display: block; margin: 6px 0 0 0; }
+.statgrille div { padding: 4px 0; font-size: 19px; }
 textarea:focus { outline: 4px solid var(--or); outline-offset: 2px; }
 .liste { margin: 0; padding-left: 22px; font-size: 18px; }
 .petit { font-size: 16px; color: #5e4468; }
@@ -873,6 +880,10 @@ function mergeState(a, b) {
   m.quiz.days = {};
   for (k in (qa.days || {})) { if ((qa.days).hasOwnProperty(k)) { m.quiz.days[k] = qa.days[k]; } }
   for (k in (qb.days || {})) { if ((qb.days).hasOwnProperty(k) && !m.quiz.days[k]) { m.quiz.days[k] = qb.days[k]; } }
+  var lgv = {}, lgs = (b.log || []).concat(a.log || []), lgo = [];
+  for (i = 0; i < lgs.length; i++) { if (lgs[i] && !lgv[lgs[i].id]) { lgv[lgs[i].id] = 1; lgo.push(lgs[i]); } }
+  lgo.sort(function (x, y) { return x.id - y.id; });
+  m.log = lgo.length > LOG_MAX ? lgo.slice(lgo.length - LOG_MAX) : lgo;
   var pa = a.plan, pb = b.plan;
   if (pb && (!pa || (pb.done || 0) > (pa.done || 0))) { m.plan = JSON.parse(JSON.stringify(pb)); }
   if (m.plan && pa && pb) { m.plan.n = Math.max(pa.n || 0, pb.n || 0, m.plan.n || 0) || undefined; }
@@ -1276,7 +1287,7 @@ function startSerie(kind, qs) {
 }
 function lancerSerie(kind) {
   var e = state.enc[kind];
-  cur = { ex: { titre: TITRES_SERIE[kind], qs: e.qs }, ctx: { kind: kind, g: kind, back: showHome }, qi: e.qi, correct: e.correct, wrong: e.wrong, written: "" };
+  cur = { ex: { titre: TITRES_SERIE[kind], qs: e.qs }, ctx: { kind: kind, g: kind, back: showHome }, qi: e.qi, correct: e.correct, wrong: e.wrong, written: "", rep: e.rep || [] };
   if (cur.qi >= e.qs.length) { finishEx(); return; }
   showQuestion();
 }
@@ -1355,7 +1366,7 @@ function finishTest() {
 
 /* ---------- Exercice (texte + questions) ---------- */
 function startEx(ex, ctx) {
-  cur = { ex: ex, ctx: ctx, qi: 0, correct: 0, wrong: [], written: "" };
+  cur = { ex: ex, ctx: ctx, qi: 0, correct: 0, wrong: [], written: "", rep: [] };
   showQuestion();
 }
 
@@ -1382,8 +1393,9 @@ function showQuestion() {
     locked = true;
     var ok = (i === q.a);
     if (ok) { cur.correct++; } else { cur.wrong.push(cur.qi + 1); }
+    noteRep(q, i, ok);
     var en = (ctx.kind === "quiz" || ctx.kind === "genre") && state.enc ? state.enc[ctx.kind] : null;
-    if (en) { en.qi = cur.qi + 1; en.correct = cur.correct; en.wrong = cur.wrong; saveState(); }
+    if (en) { en.qi = cur.qi + 1; en.correct = cur.correct; en.wrong = cur.wrong; en.rep = cur.rep; saveState(); }
     var lid = q.lid || ctx.lid;
     if (ctx.kind === "quiz" && en) {
       if (!en.res) { en.res = []; }
@@ -1406,9 +1418,9 @@ function showQuestion() {
         else if (k === i) { b.className = "option faux"; }
       }
       if (ok) {
-        m = '<div class="retour ok"><strong>Bravo !</strong> ' + (q.why ? esc(q.why) : "") + '</div>';
+        m = '<div class="retour ok"><strong>Bravo ! 🎉</strong> ' + (q.why ? esc(q.why) : "") + '</div>';
       } else {
-        m = '<div class="retour ko"><strong>Pas tout à fait.</strong> ' + (q.why ? "Voici l'indice : " + esc(q.why) : "") + '</div>';
+        m = '<div class="retour ko"><strong>Pas grave, on apprend ! 💪</strong> ' + (q.why ? "Voici l'indice : " + esc(q.why) : "") + '</div>';
       }
     }
     m += '<button class="bouton" id="b-next">' + (last ? "Continuer" : "Question suivante") + '</button>';
@@ -1425,19 +1437,38 @@ function showQuestion() {
   }
 }
 
+/* Le texte reste visible pendant le résumé tant que le niveau de l'histoire est inférieur ou égal à cette valeur.
+   Pour le retirer à partir du niveau 4 : laisser 3. Pour le retirer plus tôt ou plus tard : changer le chiffre. */
+var RELIRE_JUSQU_NIVEAU = 3;
 function showWritten() {
+  var ex = cur.ex, ctx = cur.ctx;
   var h = '<div class="carte">';
   h += '<h2>Dernière étape</h2>';
-  h += '<p>' + esc(cur.ex.ecrit) + '</p>';
-  h += '<p class="petit"><strong>Tu peux parler :</strong> touche le petit micro du clavier de l\'iPad et dis ta phrase. Relis ce qui est écrit. Si ce n\'est pas bon, touche « Effacer et redire » et recommence.</p>';
+  h += '<p>' + esc(ex.ecrit) + '</p>';
+  if (ex.texte && (!ctx.lvl || ctx.lvl <= RELIRE_JUSQU_NIVEAU)) {
+    h += '<p class="petit"><strong>Relis l\'histoire si tu en as besoin :</strong></p>';
+    h += '<div class="texte-histoire">' + esc(ex.texte) + '</div>';
+  }
+  h += '<p class="petit"><strong>Tu peux parler :</strong> touche le petit micro du clavier de l\'iPad et dis ta phrase. Relis ce qui est écrit. Si ce n\'est pas bon, touche « Effacer et redire » et recommence. <em>Pas de micro sur le clavier ? Tape ta phrase avec les lettres, ou demande à un adulte d\'activer la dictée dans Réglages &gt; Général &gt; Clavier.</em></p>';
   h += '<textarea id="ecrit" aria-label="Ta réponse"></textarea>';
   h += '<button class="bouton second" id="b-redire">Effacer et redire ma phrase</button>';
   h += '<button class="bouton" id="b-fin">Terminer</button>';
   h += '</div>';
   go(h);
   var ta = document.getElementById("ecrit");
+  /* Le clavier de l'iPad ne doit plus cacher la zone de saisie : on ajoute de la place en bas et on remonte la zone */
+  function remonte() {
+    document.body.className = (document.body.className || "") + " clavier-ouvert";
+    window.setTimeout(function () {
+      var y = ta.getBoundingClientRect().top + (window.pageYOffset || 0) - 16;
+      window.scrollTo(0, y < 0 ? 0 : y);
+    }, 350);
+  }
+  function range() { document.body.className = (document.body.className || "").replace(/\s*clavier-ouvert/g, ""); }
+  ta.addEventListener("focus", remonte, false);
+  ta.addEventListener("blur", range, false);
   bind("b-redire", function () { ta.value = ""; ta.focus(); });
-  bind("b-fin", function () { cur.written = ta.value; finishEx(); });
+  bind("b-fin", function () { range(); cur.written = ta.value; finishEx(); });
 }
 
 function finishEx() {
@@ -1486,6 +1517,7 @@ function finishEx() {
     if (state.enc) { state.enc[ctx.kind] = null; }
   }
   if (ctx.kind === "lecon" && ctx.lid) { if (!state.exi) { state.exi = {}; } state.exi[ctx.lid] = (state.exi[ctx.lid] || 0) + 1; }
+  logExercice({ id: new Date().getTime(), d: today(), h: heureNow(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, n: ex.qs.length, ok: cur.correct, qs: cur.rep || [], w: cur.written || "", qe: ex.ecrit || "" });
   state.history.push({ d: today(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, w: cur.wrong, e: cur.written, q: ex.ecrit || "", l: ctx.lvl || 0 });
   if (state.history.length > 200) { state.history = state.history.slice(state.history.length - 200); }
   saveState();
@@ -1691,9 +1723,97 @@ function statsPour(g) {
   return { n: n, moy: n ? somme / n : 0, dernier: dernier };
 }
 
+/* ---------- Journal détaillé des exercices ---------- */
+var LOG_MAX = 25;
+function cutTxt(t, n) { t = String(t == null ? "" : t); return t.length > n ? t.slice(0, n - 1) + "…" : t; }
+function heureNow() { var d = new Date(), m = d.getMinutes(); return d.getHours() + " h " + (m < 10 ? "0" + m : m); }
+function noteRep(q, i, ok) {
+  if (!cur.rep) { cur.rep = []; }
+  cur.rep.push({ q: cutTxt(q.q, 140), r: cutTxt(q.o[i], 90), b: cutTxt(q.o[q.a], 90), ok: ok ? 1 : 0 });
+}
+function logExercice(e) {
+  if (!state.log) { state.log = []; }
+  state.log.push(e);
+  if (state.log.length > LOG_MAX) { state.log = state.log.slice(state.log.length - LOG_MAX); }
+}
+function ligneRep(x) {
+  return '<div class="rep">' + (x.ok ? "✅" : "❌") + ' <strong>' + esc(x.q) + '</strong><br><span class="petit">Réponse de Vanessa : ' + esc(x.r) + (x.ok ? "" : ' · Bonne réponse : ' + esc(x.b)) + '</span></div>';
+}
+function detailExerciceTout(e) {
+  var h = '<div class="petit">' + esc(e.d) + (e.h ? " à " + esc(e.h) : "") + ' · ' + e.ok + ' bonne' + (e.ok > 1 ? "s" : "") + ' réponse' + (e.ok > 1 ? "s" : "") + ' sur ' + e.n + ' (note ' + e.s + '/10)</div>';
+  for (var i = 0; i < (e.qs || []).length; i++) { h += ligneRep(e.qs[i]); }
+  if (e.w && String(e.w).replace(/\s+/g, "")) { h += '<div class="rep">✏️ <strong>' + esc(e.qe || "Réponse écrite") + '</strong><br><span class="petit">Réponse de Vanessa : ' + esc(e.w) + '</span></div>'; }
+  return h;
+}
+function detailExercice(e, ferme) {
+  var t = detailExerciceTout(e);
+  if (!ferme) { return t; }
+  var i = t.indexOf("</div>") + 6;
+  return t.slice(0, i) + '<details class="ex"><summary>Voir les questions et les réponses</summary>' + t.slice(i) + '</details>';
+}
+function cartesJournal() {
+  var lg = state.log || [], h = "", i;
+  h += '<div class="carte"><h2>📋 Dernier exercice</h2>';
+  if (lg.length) {
+    var d = lg[lg.length - 1];
+    h += '<p><strong>' + esc(d.t) + '</strong></p>' + detailExercice(d, true);
+  } else { h += '<p class="petit">Pas encore d\'exercice enregistré en détail. Le prochain apparaîtra ici.</p>'; }
+  h += '</div>';
+  var ex = 0, nq = 0, nw = 0, somme = 0, jours = {}, k;
+  for (i = 0; i < state.history.length; i++) { var he = state.history[i]; if (typeof he.s === "number") { ex++; somme += he.s; } jours[he.d] = 1; }
+  for (k in state.stats) { if (state.stats.hasOwnProperty(k)) { nq += state.stats[k].n || 0; nw += state.stats[k].w || 0; } }
+  var lq = 0, lw = 0;
+  for (i = 0; i < lg.length; i++) { lq += lg[i].n || 0; lw += (lg[i].n || 0) - (lg[i].ok || 0); }
+  if (lq > nq) { nq = lq; nw = lw; }
+  var nj = 0; for (k in jours) { if (jours.hasOwnProperty(k)) { nj++; } }
+  h += '<div class="carte"><h2>📊 Statistiques</h2><div class="statgrille">';
+  h += '<div>Exercices faits : <strong>' + ex + '</strong></div>';
+  h += '<div>Questions répondues : <strong>' + nq + '</strong></div>';
+  h += '<div>Réussite : <strong>' + (nq ? Math.round((nq - nw) / nq * 100) : 0) + ' %</strong> (' + (nq - nw) + ' bonne' + (nq - nw > 1 ? "s" : "") + ' réponse' + (nq - nw > 1 ? "s" : "") + ')</div>';
+  h += '<div>Note moyenne : <strong>' + (ex ? fmt(somme / ex) : "0") + '/10</strong></div>';
+  h += '<div>Jours de travail : <strong>' + nj + '</strong></div>';
+  h += '</div></div>';
+  return h;
+}
+function carteDetailStats() {
+  var lg = state.log || [], i, j, h = "", agg = {}, ordre = [], rev = [], vus = {};
+  for (i = 0; i < lg.length; i++) {
+    var e = lg[i], key = e.t;
+    if (!agg[key]) { agg[key] = { ok: 0, n: 0, fois: 0 }; ordre.push(key); }
+    agg[key].ok += e.ok || 0; agg[key].n += e.n || 0; agg[key].fois++;
+  }
+  h += '<details class="carte repli"><summary>🧮 Détail par exercice</summary>';
+  if (!ordre.length) { h += '<p class="petit">Le détail apparaîtra après le prochain exercice.</p>'; }
+  for (i = ordre.length - 1; i >= 0; i--) {
+    var a = agg[ordre[i]], p = a.n ? Math.round(a.ok / a.n * 100) : 0;
+    h += '<div class="rep">' + '<strong>' + esc(ordre[i]) + '</strong>' + '<br><span class="petit">' + a.fois + ' fois · ' + a.ok + ' bonnes réponses sur ' + a.n + ' · ' + p + ' %</span></div>';
+  }
+  h += '</details>';
+  for (i = lg.length - 1; i >= 0 && rev.length < 15; i--) {
+    for (j = (lg[i].qs || []).length - 1; j >= 0 && rev.length < 15; j--) {
+      var x = lg[i].qs[j];
+      if (!x.ok && !vus[x.q]) { vus[x.q] = 1; rev.push(x); }
+    }
+  }
+  h += '<details class="carte repli"><summary>🔁 Questions à revoir</summary>';
+  if (!rev.length) { h += '<p class="petit">Aucune question ratée dans les derniers exercices. Bravo !</p>'; }
+  else { h += '<p class="petit">Les questions ratées récemment, avec la bonne réponse.</p>'; for (i = 0; i < rev.length; i++) { h += '<div class="rep">❌ ' + '<strong>' + esc(rev[i].q) + '</strong>' + '<br><span class="petit">Bonne réponse : ' + esc(rev[i].b) + '</span></div>'; } }
+  return h + '</details>';
+}
+function carteJournalListe() {
+  var lg = state.log || [], h = '<details class="carte repli"><summary>🗂️ Journal des exercices</summary>';
+  if (!lg.length) { return h + '<p class="petit">Le journal se remplit à chaque exercice.</p></details>'; }
+  h += '<p class="petit">Les ' + LOG_MAX + ' derniers exercices, du plus récent au plus ancien. Touche un exercice pour voir les questions et les réponses.</p>';
+  for (var i = lg.length - 1; i >= 0; i--) {
+    h += '<details class="ex"><summary>' + esc(lg[i].d) + ' · ' + esc(lg[i].t) + ' · ' + lg[i].ok + '/' + lg[i].n + '</summary>' + detailExercice(lg[i]) + '</details>';
+  }
+  return h + '</details>';
+}
+
 function showProgression() {
   var c = state.comp;
-  var h = '<div class="carte"><h2>Compréhension de texte</h2>';
+  var h = cartesJournal() + carteDetailStats();
+  h += '<div class="carte"><h2>📖 Compréhension de texte</h2>';
   if (c.test) {
     h += blocsNiveaux(c.level);
     h += '<p><strong>Niveau ' + c.level + ' : ' + esc(COMP_LEVELS[c.level - 1].nom) + '</strong></p>';
@@ -1716,12 +1836,12 @@ function showProgression() {
     }
   }
   h += '</div>';
-  h += '<div class="carte quiz"><h2>Quiz du jour</h2>';
+  h += '<div class="carte quiz"><h2>🔥 Quiz du jour</h2>';
   h += '<p class="petit">' + (state.quiz.total || 0) + ' quiz faits · ' + state.quiz.streak + ' jour(s) de suite</p>';
   var sq = statsPour("quiz");
   if (sq.n > 0) { h += '<p><strong>Moyenne ' + fmt(sq.moy) + '/10</strong></p>'; }
   h += '<button class="bouton second" id="b-plan">Voir mon plan de quiz</button></div>';
-  h += '<div class="carte"><h2>Mes matières</h2>';
+  h += '<details class="carte repli"><summary>📚 Mes matières</summary>';
   var any = false;
   for (var mi = 0; mi < MATIERES.length; mi++) {
     for (var ti = 0; ti < MATIERES[mi].themes.length; ti++) {
@@ -1738,7 +1858,8 @@ function showProgression() {
   var nec = 0;
   for (var q = 0; q < state.history.length; q++) { if (state.history[q].k === "ecriture") { nec++; } }
   h += '<p class="petit">Séances d\'écriture terminées : ' + nec + '</p>';
-  h += '</div>';
+  h += '</details>';
+  h += carteJournalListe();
   h += '<button class="bouton second" id="b-bilan">Copier mon bilan</button>';
   h += '<button class="bouton second" id="b-rq">Remettre le quiz à zéro</button><div id="rq-zone"></div>';
   if (SUPA_URL && SUPA_KEY) { h += '<button class="bouton second" id="b-sync">Synchronisation entre appareils</button>'; }
@@ -1794,7 +1915,7 @@ function bilanTexte() {
 
 function showBilan() {
   var h = '<div class="carte">';
-  h += '<h2>Mon bilan</h2>';
+  h += '<h2>📈 Mon bilan</h2>';
   h += '<p class="petit">Copie ce texte et colle-le dans la conversation avec ton professeur. Il l\'utilise pour préparer la suite.</p>';
   h += '<textarea id="bilan" class="bilan" readonly aria-label="Bilan à copier"></textarea>';
   h += '<button class="bouton" id="b-copy">Copier le bilan</button>';
@@ -1953,8 +2074,8 @@ function showMot() {
     state.mots[key].n++;
     if (ok) { dm.ok++; } else { state.mots[key].w++; dm.bad.push(vars.join(" ou ")); }
     saveState();
-    var m = ok ? '<div class="retour ok"><strong>Bravo !</strong> ' + esc(vars.join(" ou ")) + '</div>'
-              : '<div class="retour ko"><strong>Pas tout à fait.</strong> Ça s\'écrit : <strong>' + esc(vars.join(" ou ")) + '</strong></div>';
+    var m = ok ? '<div class="retour ok"><strong>Bravo ! 🎉</strong> ' + esc(vars.join(" ou ")) + '</div>'
+              : '<div class="retour ko"><strong>Pas grave, on apprend ! 💪</strong> Ça s\'écrit : <strong>' + esc(vars.join(" ou ")) + '</strong></div>';
     var last = (dm.i === dm.items.length - 1);
     document.getElementById("retour").innerHTML = m + '<button class="bouton" id="b-next">' + (last ? "Continuer" : "Mot suivant") + '</button>';
     document.getElementById("b-verif").style.display = "none";
