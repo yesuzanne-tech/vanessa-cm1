@@ -123,7 +123,7 @@ input.mot:focus { outline: 4px solid var(--or); outline-offset: 2px; }
 </style>
 </head>
 <body>
-<div class="bandeau"><div class="bandeau-in"><h1 class="titre">Mission CM1</h1><button class="petit-bouton" id="b-home" type="button">Accueil</button></div></div>
+<div class="bandeau"><div class="bandeau-in"><h1 class="titre">Mission CM1</h1><span><button class="petit-bouton" id="b-maj" type="button">Actualiser</button> <button class="petit-bouton" id="b-home" type="button">Accueil</button></span></div></div>
 <main id="app"></main>
 <div class="pied" id="version"></div>
 
@@ -1127,6 +1127,13 @@ function barre(s10) {
 
 /* ---------- Accueil ---------- */
 document.getElementById("b-home").addEventListener("click", function () { stopVoix(); showHome(); });
+document.getElementById("b-maj").addEventListener("click", function () {
+  stopVoix();
+  var fait = false;
+  function recharge() { if (fait) { return; } fait = true; window.location.href = window.location.pathname + "?maj=" + new Date().getTime(); }
+  window.setTimeout(recharge, 4000);
+  if (syncActif()) { syncReady = true; syncPull(function () { recharge(); }); } else { recharge(); }
+});
 
 function showHome() {
   var c = state.comp;
