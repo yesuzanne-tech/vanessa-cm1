@@ -135,7 +135,7 @@ input.mot:focus { outline: 4px solid var(--or); outline-offset: 2px; }
    { id: "m-fractions-1", titre: "Les fractions", resume: "Texte court de révision",
      exos: [ { titre: "Exercice 1", texte: "(facultatif)", qs: [ { q:"...", o:["a","b","c"], a:0, why:"..." } ], ecrit: "(facultatif)" } ] }
    ===================================================================== */
-var VERSION = "V0.0 · test non fait";
+var VERSION = "V0.1 · test non fait";
 var STORE = "mission_vanessa_v6";
 var VF = ["Vrai", "Faux"];
 
@@ -971,7 +971,8 @@ function diffJours(a, b) { return Math.round((parseIso(b).getTime() - parseIso(a
 function ajouteJours(s, n) { var d = parseIso(s); d.setDate(d.getDate() + n); return iso(d); }
 function ensurePlan() {
   var t = isoToday(), p = state.plan;
-  if (!p || !p.start || diffJours(p.start, t) < 0 || diffJours(p.start, t) >= PLAN_JOURS) { state.plan = { start: t }; saveState(); }
+  if (!p || !p.start || (p.done || 0) >= PLAN_JOURS) { state.plan = { start: t, done: 0, res: [] }; saveState(); }
+  else if (p.done === undefined) { p.done = 0; p.res = []; saveState(); }
 }
 function buildPlan() {
   ensurePlan();
@@ -998,7 +999,7 @@ function buildPlan() {
 }
 /* Quiz du jour : les questions prévues au plan + des rappels sur les points faibles, jusqu'à 10 */
 function buildDailyQuiz() {
-  var plan = buildPlan(), idx = diffJours(state.plan.start, isoToday());
+  var plan = buildPlan(), idx = Math.min(state.plan.done || 0, PLAN_JOURS - 1);
   var jour = plan[idx] || [], out = [], vus = {}, k;
   for (k = 0; k < jour.length; k++) { out.push(questionDe(jour[k])); vus[cleItem(jour[k])] = 1; }
   var p = itemsQuiz(), rand = Math.random, garde = 0;
@@ -1367,11 +1368,17 @@ function finishEx() {
   }
   if (ctx.kind === "quiz" || ctx.kind === "genre") {
     var qz = (ctx.kind === "quiz") ? state.quiz : state.genre;
-    if (qz.last !== isoToday()) {
+    var premier = (qz.last !== isoToday());
+    if (premier) {
       qz.streak = (qz.last === isoHier()) ? qz.streak + 1 : 1;
       qz.last = isoToday();
     }
     qz.total = (qz.total || 0) + 1;
+    if (ctx.kind === "quiz" && premier && state.plan) {
+      if (!state.plan.res) { state.plan.res = []; }
+      state.plan.res[state.plan.done || 0] = cur.correct + "/" + ex.qs.length;
+      state.plan.done = (state.plan.done || 0) + 1;
+    }
     if (ctx.kind === "quiz") {
       if (!qz.days) { qz.days = {}; }
       var prev = qz.days[isoToday()];
@@ -1726,17 +1733,17 @@ function showPlan() {
   var h = '<div class="carte quiz"><h2>Mon plan des 30 jours</h2>';
   h += '<p class="petit">Chaque jour : 20 questions, dont 14 prévues dans ton plan et 6 pour revoir tes points faibles. Environ 9 questions sur 10 portent sur le français et les maths.</p></div>';
   h += '<div class="carte">';
+  var fait = state.plan.done || 0;
   for (var d = 0; d < plan.length; d++) {
-    var date = ajouteJours(start, d), dt = parseIso(date), codes = [], vus = {};
+    var codes = [], vus = {};
     for (var k = 0; k < plan[d].length; k++) {
       var c = codeLecon(plan[d][k].l);
       if (!vus[c]) { vus[c] = 1; codes.push(c); }
     }
-    var j = dt.getDate(), m = dt.getMonth() + 1;
     var st = "";
-    if (state.quiz.days && state.quiz.days[date] !== undefined) { var vd = state.quiz.days[date]; st = ' <span class="pastille">✓ ' + (typeof vd === "number" ? vd + "/10" : vd.c + "/" + vd.t) + '</span>'; }
-    else if (date === t) { st = ' <span class="pastille">Aujourd\'hui</span>'; }
-    h += '<div class="ligne"><strong>' + JOURS_FR[dt.getDay()] + ' ' + j + '/' + (m < 10 ? "0" + m : m) + '</strong>' + st + '<div class="petit">' + esc(codes.join(" · ")) + '</div></div>';
+    if (d < fait) { st = ' <span class="pastille">✓ ' + esc((state.plan.res && state.plan.res[d]) || "fait") + '</span>'; }
+    else if (d === fait) { st = ' <span class="pastille">Prochain quiz</span>'; }
+    h += '<div class="ligne"><strong>Jour ' + (d + 1) + '</strong>' + st + '<div class="petit">' + esc(codes.join(" · ")) + '</div></div>';
   }
   h += '</div><button class="bouton second" id="b-ret">Retour</button>';
   go(h);
