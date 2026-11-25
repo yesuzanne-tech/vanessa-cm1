@@ -872,6 +872,7 @@ function mergeState(a, b) {
   for (k in (qb.days || {})) { if ((qb.days).hasOwnProperty(k) && !m.quiz.days[k]) { m.quiz.days[k] = qb.days[k]; } }
   var pa = a.plan, pb = b.plan;
   if (pb && (!pa || (pb.done || 0) > (pa.done || 0))) { m.plan = JSON.parse(JSON.stringify(pb)); }
+  if (m.plan && pa && pb) { m.plan.n = Math.max(pa.n || 0, pb.n || 0, m.plan.n || 0) || undefined; }
   return m;
 }
 var syncDirty = false;
@@ -1033,7 +1034,7 @@ function buildGenre(nb) {
   return out;
 }
 /* Plan sur 30 jours : même quiz prévu pour chaque jour, tiré d'une suite mélangée avec une graine */
-var PLAN_JOURS = 30, PLAN_PAR_JOUR = 14, NB_QUIZ = 20, NB_GENRE = 10;
+var PLAN_JOURS = 30, PLAN_AJOUT = 10, PLAN_MAX = 150, PLAN_PAR_JOUR = 14, NB_QUIZ = 20, NB_GENRE = 10;
 function rngSeed(str) {
   var h = 2166136261, i;
   for (i = 0; i < str.length; i++) { h = (h ^ str.charCodeAt(i)) >>> 0; h = Math.imul(h, 16777619) >>> 0; }
@@ -1045,17 +1046,21 @@ function diffJours(a, b) { return Math.round((parseIso(b).getTime() - parseIso(a
 function ajouteJours(s, n) { var d = parseIso(s); d.setDate(d.getDate() + n); return iso(d); }
 function ensurePlan() {
   var t = isoToday(), p = state.plan;
-  if (!p || !p.start || (p.done || 0) >= PLAN_JOURS) { state.plan = { start: t, done: 0, res: [] }; saveState(); }
-  else if (p.done === undefined) { p.done = 0; p.res = []; saveState(); }
+  if (!p || !p.start || (p.done || 0) >= PLAN_MAX) { state.plan = { start: t, done: 0, res: [], n: PLAN_JOURS }; saveState(); return; }
+  if (p.done === undefined) { p.done = 0; p.res = []; saveState(); }
+  var n = p.n || PLAN_JOURS;
+  while ((p.done || 0) >= n - 1 && n < PLAN_MAX) { n += PLAN_AJOUT; }
+  if (n !== p.n) { p.n = n; saveState(); }
 }
+function planN() { return (state.plan && state.plan.n) || PLAN_JOURS; }
 function buildPlan() {
   ensurePlan();
   var p = itemsQuiz(), rand = rngSeed("plan:" + state.plan.start);
-  var seqMain = [], seqAutres = [], besoin = PLAN_JOURS * PLAN_PAR_JOUR + 20;
+  var seqMain = [], seqAutres = [], besoin = PLAN_MAX * PLAN_PAR_JOUR + 20;
   while (p.main.length && seqMain.length < besoin) { seqMain = seqMain.concat(melangeTab(p.main, rand)); }
   while (p.autres.length && seqAutres.length < besoin) { seqAutres = seqAutres.concat(melangeTab(p.autres, rand)); }
   var pm = 0, pa = 0, jours = [];
-  for (var d = 0; d < PLAN_JOURS; d++) {
+  for (var d = 0; d < planN(); d++) {
     var jour = [], vus = {}, essais = 0;
     while (jour.length < PLAN_PAR_JOUR && essais < 300) {
       essais++;
@@ -1073,7 +1078,7 @@ function buildPlan() {
 }
 /* Quiz du jour : les questions prévues au plan + des rappels sur les points faibles, jusqu'à 10 */
 function buildDailyQuiz() {
-  var plan = buildPlan(), idx = Math.min(state.plan.done || 0, PLAN_JOURS - 1);
+  var plan = buildPlan(), idx = Math.min(state.plan.done || 0, planN() - 1);
   var jour = plan[idx] || [], out = [], vus = {}, k;
   for (k = 0; k < jour.length; k++) { out.push(questionDe(jour[k])); vus[cleItem(jour[k])] = 1; }
   var p = itemsQuiz(), rand = Math.random, garde = 0;
@@ -1136,23 +1141,24 @@ document.getElementById("b-maj").addEventListener("click", function () {
 });
 
 function showHome() {
+  ensurePlan();
   var c = state.comp;
   var h = '<div class="carte"><h2>Salut Vanessa !</h2><p>Choisis ce que tu veux travailler aujourd\'hui.</p></div>';
   var faitComp = (c.last === isoToday());
   h += '<div class="carte"><h2>Compréhension de texte</h2>';
   if (!c.test) { h += '<p class="petit">Commence par un petit test pour voir où tu en es.</p>'; }
-  else if (faitComp) { h += '<p><span class="pastille">Fait aujourd\'hui</span> Ton texte du jour est terminé. À demain pour le suivant !</p>'; }
-  else { h += '<p>Ton texte du jour t\'attend.</p>'; }
-  h += '<button class="bouton" id="b-comp">' + (!c.test ? "Faire le test de départ" : (faitComp ? "Ouvrir" : "Lire le texte du jour")) + '</button></div>';
+  else if (faitComp) { h += '<p><span class="pastille">Fait aujourd\'hui</span> Bravo ! Tu peux lire autant de textes que tu veux.</p>'; }
+  else { h += '<p>Lis autant de textes que tu veux.</p>'; }
+  h += '<button class="bouton" id="b-comp">' + (!c.test ? "Faire le test de départ" : (faitComp ? "Lire un autre texte" : "Lire un texte")) + '</button></div>';
   var qz = state.quiz, fait = (qz.last === isoToday());
   var encQ = encGet("quiz");
   h += '<div class="carte quiz"><h2>Quiz du jour</h2>';
   if (encQ) { h += '<p>' + (encQ.qi >= encQ.qs.length ? 'Ton quiz est terminé : touche pour voir ton résultat.' : 'Tu t\'étais arrêtée à la question ' + (encQ.qi + 1) + ' sur ' + encQ.qs.length + '. On continue ?') + '</p>'; }
-  else if (fait) { h += '<p><span class="pastille">Fait aujourd\'hui</span> Bravo ! Tu peux en refaire un pour t\'entraîner.</p>'; }
-  else { h += '<p>Vingt questions sur tes leçons. Un quiz par jour, c\'est le secret.</p>'; }
+  else if (fait) { h += '<p><span class="pastille">Fait aujourd\'hui</span> Bravo ! Tu peux en faire un autre : chaque quiz compte.</p>'; }
+  else { h += '<p>Vingt questions sur tes leçons. Tu peux en faire autant que tu veux : chaque quiz compte.</p>'; }
   if (qz.streak > 0) { h += '<p class="petit">' + qz.streak + ' jour' + (qz.streak > 1 ? "s" : "") + ' de suite</p>'; }
   if (encQ) { h += '<button class="bouton" id="b-quiz-reprise">Reprendre le quiz</button></div>'; }
-  else { h += '<button class="bouton" id="b-quiz">' + (fait ? "Refaire un quiz" : "Faire le quiz du jour") + '</button></div>'; }
+  else { h += '<button class="bouton" id="b-quiz">' + (fait ? "Faire un autre quiz" : "Faire un quiz") + '</button></div>'; }
   h += '<div class="carte"><h2>Mes matières</h2>';
   for (var i = 0; i < MATIERES.length; i++) {
     h += '<button class="option" id="m' + i + '">' + esc(MATIERES[i].nom) + '</button>';
@@ -1272,7 +1278,7 @@ function lancerSerie(kind) {
   showQuestion();
 }
 function startQuiz(libre) {
-  var qs = libre ? buildQuiz(NB_QUIZ) : buildDailyQuiz();
+  var qs = buildDailyQuiz();
   if (qs.length === 0) { showHome(); return; }
   startSerie("quiz", qs);
 }
@@ -1289,11 +1295,10 @@ function showComp() {
   if (!c.test) {
     h += '<p>Avant de commencer, un petit test pour voir où tu en es. Tu lis 3 textes et tu réponds aux questions. Fais de ton mieux : tu peux te tromper, ça aide à choisir les bons textes pour toi.</p>';
     h += '<button class="bouton" id="b-test">Faire le test de départ</button>';
-  } else if (c.last === isoToday()) {
-    h += '<p><span class="pastille">Fait aujourd\'hui</span></p><p>Bravo, ton texte du jour est terminé. Reviens demain pour un nouveau texte !</p>';
   } else {
-    h += '<p>Un texte par jour, c\'est le secret pour progresser. Prêt ?</p>';
-    h += '<button class="bouton" id="b-go">Lire le texte du jour</button>';
+    if (c.last === isoToday()) { h += '<p><span class="pastille">Fait aujourd\'hui</span></p>'; }
+    h += '<p>Tu peux lire autant de textes que tu veux : à chaque fois, un nouveau texte. Prêt ?</p>';
+    h += '<button class="bouton" id="b-go">Lire un texte</button>';
   }
   h += '</div>';
   h += '<button class="bouton second" id="b-ret">Retour</button>';
@@ -1305,7 +1310,6 @@ function showComp() {
 
 function startComp() {
   if (!state.comp.test) { showComp(); return; }
-  if (state.comp.last === isoToday()) { showComp(); return; }
   var lvl = state.comp.level;
   var lv = COMP_LEVELS[lvl - 1];
   var idx = (state.comp.pos[String(lvl)] || 0) % lv.texts.length;
@@ -1456,10 +1460,11 @@ function finishEx() {
       qz.last = isoToday();
     }
     qz.total = (qz.total || 0) + 1;
-    if (ctx.kind === "quiz" && premier && state.plan) {
+    if (ctx.kind === "quiz" && state.plan) {
       if (!state.plan.res) { state.plan.res = []; }
       state.plan.res[state.plan.done || 0] = cur.correct + "/" + ex.qs.length;
       state.plan.done = (state.plan.done || 0) + 1;
+      ensurePlan();
     }
     if (ctx.kind === "quiz") {
       if (!qz.days) { qz.days = {}; }
@@ -1712,7 +1717,7 @@ function showProgression() {
   h += '<p class="petit">' + (state.quiz.total || 0) + ' quiz faits · ' + state.quiz.streak + ' jour(s) de suite</p>';
   var sq = statsPour("quiz");
   if (sq.n > 0) { h += '<p><strong>Moyenne ' + fmt(sq.moy) + '/10</strong></p>'; }
-  h += '<button class="bouton second" id="b-plan">Voir le plan des 30 jours</button></div>';
+  h += '<button class="bouton second" id="b-plan">Voir mon plan de quiz</button></div>';
   h += '<div class="carte"><h2>Mes matières</h2>';
   var any = false;
   for (var mi = 0; mi < MATIERES.length; mi++) {
@@ -1814,8 +1819,8 @@ function codeLecon(l) { var p = l.titre.split(" · "); return p.length > 1 ? p[0
 function showPlan() {
   ensurePlan();
   var plan = buildPlan(), start = state.plan.start, t = isoToday();
-  var h = '<div class="carte quiz"><h2>Mon plan des 30 jours</h2>';
-  h += '<p class="petit">Chaque jour : 20 questions, dont 14 prévues dans ton plan et 6 pour revoir tes points faibles. Environ 9 questions sur 10 portent sur le français et les maths.</p></div>';
+  var h = '<div class="carte quiz"><h2>Mon plan de quiz</h2>';
+  h += '<p class="petit">Chaque quiz : 20 questions, dont 14 prévues dans ton plan et 6 pour revoir tes points faibles. Quand tu arrives au dernier quiz, 10 nouveaux sont préparés. Environ 9 questions sur 10 portent sur le français et les maths.</p></div>';
   h += '<div class="carte">';
   var fait = state.plan.done || 0;
   for (var d = 0; d < plan.length; d++) {
