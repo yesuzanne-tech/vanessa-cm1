@@ -133,7 +133,7 @@ input.mot:focus { outline: 4px solid var(--or); outline-offset: 2px; }
 </style>
 </head>
 <body>
-<div class="bandeau"><div class="bandeau-in"><h1 class="titre">Mission CM1</h1><span><button class="petit-bouton" id="b-maj" type="button" aria-label="Actualiser" title="Actualiser" style="padding:6px 10px;vertical-align:middle"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><polyline points="20 3 20 8 15 8"/></svg></button> <button class="petit-bouton" id="b-home" type="button">Accueil</button></span></div></div>
+<div class="bandeau"><div class="bandeau-in"><h1 class="titre">Mission CM1</h1><span><button class="petit-bouton" id="b-maj" type="button" aria-label="Actualiser" title="Actualiser" style="padding:6px 10px;vertical-align:middle"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M20 12a8 8 0 1 1-2.6-5.9"/><polyline points="20 3 20 8 15 8"/></svg></button> <button class="petit-bouton" id="b-home" type="button" aria-label="Accueil" title="Accueil" style="padding:6px 10px;vertical-align:middle"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M3 11.5l9-8 9 8"/><path d="M5.5 10v10.5h4.5v-6h4v6h4.5V10"/></svg></button></span></div></div>
 <main id="app"></main>
 <div class="pied" id="version"></div>
 
@@ -2131,7 +2131,7 @@ function showHome() {
   if (encQ) { h += '<button class="bouton" id="b-quiz-reprise">Reprendre le quiz</button></div>'; }
   else { h += '<button class="bouton" id="b-quiz">' + (fait ? "Faire un autre quiz" : "Faire un quiz") + '</button></div>'; }
   var devOn = devActifs().length > 0;
-  h += '<div class="carte"><h2>Devoirs de la maîtresse</h2><p>' + (devOn ? 'Les leçons à apprendre et les mini-quiz pour l\'école.' : 'Pas de devoir pour le moment.') + '</p><button class="bouton" id="b-dev"' + (devOn ? '' : ' disabled style="opacity:.4"') + '>Voir mes devoirs</button></div>';
+  h += '<div class="carte"><h2>Devoirs de la maîtresse</h2><p>' + (devOn ? 'Les leçons à apprendre et les mini-quiz pour l\'école.' : 'Pas de devoir pour le moment. Prochain jour de devoirs : <b>' + prochainDevoirTxt() + '</b>.') + '</p><button class="bouton" id="b-dev"' + (devOn ? '' : ' disabled style="opacity:.4"') + '>Voir mes devoirs</button></div>';
   h += '<div class="carte"><h2>Mes matières</h2>';
   for (var i = 0; i < MATIERES.length; i++) {
     h += '<button class="option" id="m' + i + '">' + esc(MATIERES[i].nom) + '</button>';
@@ -2157,6 +2157,10 @@ function showHome() {
    Le module n'est actif que jusqu'à cette date incluse ; sans devoir actif, le bouton est grisé. */
 var DEVOIRS = [];
 var NB_DEV_SERIES = 5, NB_DEV_Q = 10;
+var NOMS_JOURS = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"], NOMS_MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+/* Jours d'école : lundi, mardi, jeudi, vendredi. Le devoir attendu est celui du prochain jour d'école. */
+function prochainJourEcole() { var d = new Date(); do { d.setDate(d.getDate() + 1); } while ([1, 2, 4, 5].indexOf(d.getDay()) < 0); return d; }
+function prochainDevoirTxt() { var d = prochainJourEcole(); return NOMS_JOURS[d.getDay()] + " " + d.getDate() + " " + NOMS_MOIS[d.getMonth()]; }
 function devActif(d) { return !!d.date && d.date >= isoToday(); }
 function devActifs() { var r = []; for (var i = 0; i < DEVOIRS.length; i++) { if (devActif(DEVOIRS[i])) { r.push(DEVOIRS[i]); } } return r; }
 function devParId(id) { for (var i = 0; i < DEVOIRS.length; i++) { if (DEVOIRS[i].id === id) { return DEVOIRS[i]; } } return null; }
@@ -2201,7 +2205,7 @@ function buildDevQuiz(d, serie) {
 }
 function showDevoirs() {
   var h = '<div class="carte"><h2>Devoirs de la maîtresse</h2><p>Les leçons à apprendre pour l\'école. Lis la leçon, fais les exercices, puis passe les 5 mini-quiz de 10 questions.</p></div>';
-  if (!devActifs().length) { h += '<div class="carte"><p>Aucun devoir pour le moment.</p></div>'; }
+  if (!devActifs().length) { h += '<div class="carte"><p>Aucun devoir pour le moment.<br>Prochain jour de devoirs : <b>' + prochainDevoirTxt() + '</b>.</p></div>'; }
   for (var i = DEVOIRS.length - 1; i >= 0; i--) {
     var d = DEVOIRS[i];
     if (!devActif(d)) { continue; }
@@ -2416,7 +2420,7 @@ function finishTest() {
   state.comp.streak = 0;
   state.comp.low = 0;
   state.comp.last = isoToday();
-  state.history.push({ d: today(), k: "test", g: "comprehension", t: "Test de départ", s: pct10(a + b + c, 13), w: [], e: "", q: "", l: level });
+  state.history.push({ h: heureNow(), d: today(), k: "test", g: "comprehension", t: "Test de départ", s: pct10(a + b + c, 13), w: [], e: "", q: "", l: level });
   saveState();
   var h = '<div class="carte" style="text-align:center">';
   h += '<div class="etoiles">★★★</div><h2>Test terminé, bravo !</h2>';
@@ -2582,8 +2586,8 @@ function finishEx() {
   }
   if (ctx.kind === "devoir") { var dvs = devScores(ctx.dev); if (dvs[ctx.serie] === undefined || cur.correct > dvs[ctx.serie]) { dvs[ctx.serie] = cur.correct; } }
   if (ctx.kind === "lecon" && ctx.lid) { if (!state.exi) { state.exi = {}; } state.exi[ctx.lid] = (state.exi[ctx.lid] || 0) + 1; }
-  logExercice({ id: new Date().getTime(), d: today(), h: heureNow(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, n: ex.qs.length, ok: cur.correct, qs: cur.rep || [], w: cur.written || "", qe: ex.ecrit || "" });
-  state.history.push({ d: today(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, w: cur.wrong, e: cur.written, q: ex.ecrit || "", l: ctx.lvl || 0 });
+  logExercice({ id: new Date().getTime(), d: today(), h: heureNow(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, n: ex.qs.length, ok: cur.correct, qs: cur.rep || [], w: cur.written || "", qe: ex.ecrit || "", tx: (ctx.kind === "comp" && ex.texte) ? ex.texte : "" });
+  state.history.push({ h: heureNow(), d: today(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, w: cur.wrong, e: cur.written, q: ex.ecrit || "", l: ctx.lvl || 0 });
   if (state.history.length > 200) { state.history = state.history.slice(state.history.length - 200); }
   saveState();
   showResult(info);
@@ -2605,7 +2609,7 @@ function showResult(info) {
   if (cur.written) { h += '<button class="bouton" id="b-envoi">Envoyer ma réponse à mon professeur</button>'; }
   if (ctx.again) { h += '<button class="bouton" id="b-again">Exercice suivant</button>'; }
   h += '<button class="bouton second" id="b-back">' + (ctx.kind === "comp" ? "Retour à la compréhension" : ((ctx.kind === "quiz" || ctx.kind === "genre") ? "Retour à l'accueil" : "Retour")) + '</button>';
-  h += '<button class="bouton second" id="b-acc">Accueil</button>';
+  h += '<button class="bouton second" id="b-acc">🏠</button>';
   h += '</div>';
   go(h);
   bind("b-envoi", showEnvoi);
@@ -2659,13 +2663,13 @@ function showSeance(mi, i) {
   bind("b-ret", function () { showEcriture(mi); });
   bind("b-fin-ec", function () {
     if (!photoOk) { document.getElementById("ec-msg").textContent = "Ajoute d'abord la photo de ta feuille."; return; }
-    state.history.push({ d: today(), k: "ecriture", g: "ecriture", t: e.titre, s: null, w: [], e: "", q: e.consigne, l: 0 });
+    state.history.push({ h: heureNow(), d: today(), k: "ecriture", g: "ecriture", t: e.titre, s: null, w: [], e: "", q: e.consigne, l: 0 });
     saveState();
     var d = '<div class="carte" style="text-align:center"><div class="etoiles">★★★</div>';
     d += '<h2>Séance terminée !</h2>';
     d += '<p>Garde ta feuille et ta photo : ton professeur les regardera avec toi.</p>';
     d += '<button class="bouton" id="b-envoi">Préparer le message pour mon professeur</button>';
-    d += '<button class="bouton second" id="b-acc">Accueil</button></div>';
+    d += '<button class="bouton second" id="b-acc">🏠</button></div>';
     go(d);
     bind("b-envoi", showEnvoi);
     bind("b-acc", showHome);
@@ -2721,7 +2725,7 @@ function showEnvoi() {
   h += '<button class="bouton" id="b-copy2">Copier le message</button>';
   h += '<p class="petit" id="copie-msg2"></p>';
   h += '<button class="bouton second" id="b-prof2">Message de mon professeur</button>';
-  h += '<button class="bouton second" id="b-ret2">Accueil</button>';
+  h += '<button class="bouton second" id="b-ret2">🏠</button>';
   h += '</div>';
   go(h);
   var ta = document.getElementById("envoi");
@@ -2766,7 +2770,7 @@ function showProf() {
   h += '<button class="bouton" id="b-ecoute">Écouter</button>';
   h += '<button class="bouton second" id="b-stop">Arrêter</button>';
   h += '<p class="petit" id="prof-msg"></p>';
-  h += '<button class="bouton second" id="b-ret3">Accueil</button>';
+  h += '<button class="bouton second" id="b-ret3">🏠</button>';
   h += '</div>';
   go(h);
   var ta = document.getElementById("msgprof");
@@ -2800,6 +2804,41 @@ function noteRep(q, i, ok) {
   if (!cur.rep) { cur.rep = []; }
   cur.rep.push({ q: cutTxt(q.q, 140), r: cutTxt(q.o[i], 90), b: cutTxt(q.o[q.a], 90), ok: ok ? 1 : 0 });
 }
+function texteDe(e) {
+  if (e.tx) { return e.tx; }
+  if (e.k !== "comp") { return ""; }
+  for (var l = 0; l < COMP_LEVELS.length; l++) {
+    var ts = COMP_LEVELS[l].texts || [];
+    for (var i = 0; i < ts.length; i++) { if (ts[i].titre === e.t && ts[i].texte) { return ts[i].texte; } }
+  }
+  return "";
+}
+function texteParTitre(t) {
+  for (var l = 0; l < COMP_LEVELS.length; l++) {
+    var ts = COMP_LEVELS[l].texts || [];
+    for (var i = 0; i < ts.length; i++) { if (ts[i].titre === t && ts[i].texte) { return ts[i]; } }
+  }
+  return null;
+}
+function apercuTexte(he) {
+  var x = texteParTitre(he.t);
+  if (!x) { return ""; }
+  var h = '<div class="lecon-txt" style="margin:8px 0"><strong>📖 Le texte</strong><br>' + esc(x.texte).replace(/\n/g, "<br>") + '</div>';
+  for (var i = 0; i < (x.qs || []).length; i++) {
+    var q = x.qs[i];
+    h += '<div class="rep"><strong>' + esc(q.q) + '</strong><br><span class="petit">Bonne réponse : ' + esc(q.o[q.a]) + '</span></div>';
+  }
+  return h + '<p class="petit">Les réponses de Vanessa à ce texte n\'ont pas été conservées.</p>';
+}
+function logDeLigne(he) {
+  var lg = state.log || [];
+  for (var i = lg.length - 1; i >= 0; i--) {
+    if (lg[i].k === "comp" && lg[i].d === he.d && lg[i].t === he.t && (!he.h || he.h === lg[i].h)) { return lg[i]; }
+  }
+  return null;
+}
+function dateHeure(e) { return esc(e.d) + (e.h ? " à " + esc(e.h) : ""); }
+function derniereHistoire(pred) { for (var i = state.history.length - 1; i >= 0; i--) { if (pred(state.history[i])) { return state.history[i]; } } return null; }
 function logExercice(e) {
   if (!state.log) { state.log = []; }
   state.log.push(e);
@@ -2831,6 +2870,8 @@ function ligneRep(x) {
 }
 function detailExerciceTout(e) {
   var h = '<div class="petit">📅 ' + esc(dateLisible(e.d)) + (e.h ? " à " + esc(e.h) : "") + ' · ' + e.ok + ' bonne' + (e.ok > 1 ? "s" : "") + ' réponse' + (e.ok > 1 ? "s" : "") + ' sur ' + e.n + ' (note ' + e.s + '/10)</div>';
+  var tx = texteDe(e);
+  if (tx) { h += '<div class="lecon-txt" style="margin:8px 0"><strong>📖 Le texte</strong><br>' + esc(tx).replace(/\n/g, "<br>") + '</div>'; }
   for (var i = 0; i < (e.qs || []).length; i++) { h += ligneRep(e.qs[i]); }
   if (e.w && String(e.w).replace(/\s+/g, "")) { h += '<div class="rep">✏️ <strong>' + esc(e.qe || "Réponse écrite") + '</strong><br><span class="petit">Réponse de Vanessa : ' + esc(e.w) + '</span></div>'; }
   return h;
@@ -2870,25 +2911,25 @@ function carteDetailStats() {
   for (i = 0; i < lg.length; i++) {
     var e = lg[i], key = e.t;
     if (!agg[key]) { agg[key] = { ok: 0, n: 0, fois: 0 }; ordre.push(key); }
-    agg[key].dern = e.d;
+    agg[key].dern = e.d; agg[key].dernh = e.h || "";
     agg[key].ok += e.ok || 0; agg[key].n += e.n || 0; agg[key].fois++;
   }
   h += '<details class="carte repli"><summary>🧮 Détail par exercice</summary>';
   if (!ordre.length) { h += '<p class="petit">Le détail apparaîtra après le prochain exercice.</p>'; }
   for (i = ordre.length - 1; i >= 0; i--) {
     var a = agg[ordre[i]], p = a.n ? Math.round(a.ok / a.n * 100) : 0;
-    h += '<div class="rep">' + '<strong>' + esc(ordre[i]) + '</strong>' + '<br><span class="petit">' + a.fois + ' fois · ' + a.ok + ' bonnes réponses sur ' + a.n + ' · ' + p + ' % · dernier : ' + esc(dateLisible(a.dern)) + '</span></div>';
+    h += '<div class="rep">' + '<strong>' + esc(ordre[i]) + '</strong>' + '<br><span class="petit">' + a.fois + ' fois · ' + a.ok + ' bonnes réponses sur ' + a.n + ' · ' + p + ' % · dernier : ' + esc(dateLisible(a.dern)) + (a.dernh ? ' à ' + esc(a.dernh) : '') + '</span></div>';
   }
   h += '</details>';
   for (i = lg.length - 1; i >= 0 && rev.length < 15; i--) {
     for (j = (lg[i].qs || []).length - 1; j >= 0 && rev.length < 15; j--) {
       var x = lg[i].qs[j];
-      if (!x.ok && !vus[x.q]) { vus[x.q] = 1; x.dt = lg[i].d; rev.push(x); }
+      if (!x.ok && !vus[x.q]) { vus[x.q] = 1; x.dt = lg[i].d; x.ht = lg[i].h || ""; rev.push(x); }
     }
   }
   h += '<details class="carte repli"><summary>🔁 Questions à revoir</summary>';
   if (!rev.length) { h += '<p class="petit">Aucune question ratée dans les derniers exercices. Bravo !</p>'; }
-  else { h += '<p class="petit">Les questions ratées récemment, avec la bonne réponse.</p>'; for (i = 0; i < rev.length; i++) { h += '<div class="rep">❌ ' + '<strong>' + esc(rev[i].q) + '</strong>' + '<br><span class="petit">Bonne réponse : ' + esc(rev[i].b) + (rev[i].dt ? ' · ' + esc(dateLisible(rev[i].dt)) : '') + '</span></div>'; } }
+  else { h += '<p class="petit">Les questions ratées récemment, avec la bonne réponse.</p>'; for (i = 0; i < rev.length; i++) { h += '<div class="rep">❌ ' + '<strong>' + esc(rev[i].q) + '</strong>' + '<br><span class="petit">Bonne réponse : ' + esc(rev[i].b) + (rev[i].dt ? ' · ' + esc(dateLisible(rev[i].dt)) + (rev[i].ht ? ' à ' + esc(rev[i].ht) : '') : '') + '</span></div>'; } }
   return h + '</details>';
 }
 function carteJournalListe() {
@@ -2896,7 +2937,7 @@ function carteJournalListe() {
   if (!lg.length) { return h + '<p class="petit">Le journal se remplit à chaque exercice.</p></details>'; }
   h += '<p class="petit">Les ' + LOG_MAX + ' derniers exercices, du plus récent au plus ancien. Touche un exercice pour voir les questions et les réponses.</p>';
   for (var i = lg.length - 1; i >= 0; i--) {
-    h += '<details class="ex"><summary>' + esc(dateLisible(lg[i].d)) + ' · ' + esc(lg[i].t) + ' · ' + lg[i].ok + '/' + lg[i].n + '</summary>' + detailExercice(lg[i]) + '</details>';
+    h += '<details class="ex"><summary>' + esc(dateLisible(lg[i].d)) + (lg[i].h ? ' à ' + esc(lg[i].h) : '') + ' · ' + esc(lg[i].t) + ' · ' + lg[i].ok + '/' + lg[i].n + '</summary>' + detailExercice(lg[i]) + '</details>';
   }
   return h + '</details>';
 }
@@ -2918,12 +2959,18 @@ function showProgression() {
   if (st.n > 0) {
     h += '<p><strong>' + st.n + ' texte' + (st.n > 1 ? "s" : "") + ' lu' + (st.n > 1 ? "s" : "") + ' · moyenne ' + fmt(st.moy) + '/10</strong></p>';
     var lignes = [];
-    for (var i = state.history.length - 1; i >= 0 && lignes.length < 6; i--) {
+    for (var i = state.history.length - 1; i >= 0; i--) {
       var e = state.history[i];
       if (e.g === "comprehension" && e.k === "comp") { lignes.push(e); }
     }
     for (var k = 0; k < lignes.length; k++) {
-      h += '<div class="ligne"><div class="petit">' + esc(lignes[k].d) + ' · ' + esc(lignes[k].t) + ' · ' + lignes[k].s + '/10</div>' + barre(lignes[k].s) + '</div>';
+      var lgk = logDeLigne(lignes[k]), entete = esc(lignes[k].d) + (lignes[k].h ? ' à ' + esc(lignes[k].h) : '') + ' · ' + esc(lignes[k].t) + ' · ' + lignes[k].s + '/10';
+      if (lgk) { h += '<details class="ex"><summary>' + entete + '</summary>' + barre(lignes[k].s) + detailExercice(lgk) + '</details>'; }
+      else {
+        var apc = apercuTexte(lignes[k]);
+        if (apc) { h += '<details class="ex"><summary>' + entete + '</summary>' + barre(lignes[k].s) + apc + '</details>'; }
+        else { h += '<div class="ligne"><div class="petit">' + entete + '</div>' + barre(lignes[k].s) + '</div>'; }
+      }
     }
   }
   h += '</div>';
@@ -2932,6 +2979,8 @@ function showProgression() {
   h += '<p class="petit">' + (state.quiz.total || 0) + ' quiz faits · ' + state.quiz.streak + ' jour(s) de suite</p>';
   var sq = statsPour("quiz");
   if (sq.n > 0) { h += '<p><strong>Moyenne ' + fmt(sq.moy) + '/10</strong></p>'; }
+  var dq = derniereHistoire(function (x) { return x.k === "quiz"; });
+  if (dq) { h += '<p class="petit">Dernier quiz : ' + dateHeure(dq) + '</p>'; }
   h += carteQuizFaits();
   h += '<button class="bouton second" id="b-plan">Voir mon plan de quiz</button></div>';
   h += '<details class="carte repli"><summary>📚 Mes matières</summary>';
@@ -2943,7 +2992,7 @@ function showProgression() {
       var s2 = statsPour(t.id);
       if (s2.n > 0) {
         any = true;
-        h += '<div class="ligne"><div><strong>' + esc(t.nom) + '</strong> <span class="petit">· ' + s2.n + ' exercice' + (s2.n > 1 ? "s" : "") + ' · moyenne ' + fmt(s2.moy) + '/10 · dernier ' + s2.dernier + '/10</span></div>' + barre(Math.round(s2.moy)) + '</div>';
+        h += '<div class="ligne"><div><strong>' + esc(t.nom) + '</strong> <span class="petit">· ' + s2.n + ' exercice' + (s2.n > 1 ? "s" : "") + ' · moyenne ' + fmt(s2.moy) + '/10 · dernier ' + s2.dernier + '/10' + (function () { var le = derniereHistoire(function (x) { return x.g === t.id && typeof x.s === "number"; }); return le ? ' · le ' + dateHeure(le) : ''; })() + '</span></div>' + barre(Math.round(s2.moy)) + '</div>';
       }
     }
   }
@@ -2996,7 +3045,7 @@ function bilanTexte() {
   if (n === 0) { l.push("(aucune séance pour l'instant)"); }
   for (var i = Math.max(0, n - 15); i < n; i++) {
     var e = state.history[i];
-    var ligne = "- " + e.d + " | " + themeNom(e.g) + " | " + e.t;
+    var ligne = "- " + e.d + (e.h ? " à " + e.h : "") + " | " + themeNom(e.g) + " | " + e.t;
     if (typeof e.s === "number") { ligne += " | " + e.s + "/10"; }
     if (e.k === "ecriture") { ligne += " | séance d'écriture (photo à envoyer séparément)"; }
     if (e.w && e.w.length) { ligne += " | erreurs aux questions : " + e.w.join(", "); }
@@ -3188,7 +3237,7 @@ function showMot() {
 function finishMots() {
   stopVoix();
   var s = pct10(dm.ok, dm.items.length);
-  state.history.push({ d: today(), k: "dictee", g: "dictee" + dm.d.n, t: "Dictée " + dm.d.n + " · mots (" + GROUPES[dm.gi].nom + ")", s: s, w: [], e: "", q: "", l: 0 });
+  state.history.push({ h: heureNow(), d: today(), k: "dictee", g: "dictee" + dm.d.n, t: "Dictée " + dm.d.n + " · mots (" + GROUPES[dm.gi].nom + ")", s: s, w: [], e: "", q: "", l: 0 });
   if (state.history.length > 200) { state.history = state.history.slice(state.history.length - 200); }
   saveState();
   var etoiles = s >= 10 ? "★★★" : (s >= 8 ? "★★☆" : (s >= 6 ? "★☆☆" : "☆☆☆"));
@@ -3197,7 +3246,7 @@ function finishMots() {
   if (dm.bad.length) { h += '<p class="petit" style="text-align:left"><strong>Mots à revoir :</strong> ' + esc(dm.bad.join(" · ")) + '</p>'; }
   h += '<button class="bouton" id="b-again">Recommencer avec d\'autres mots</button>';
   h += '<button class="bouton second" id="b-ret">Retour à la dictée</button>';
-  h += '<button class="bouton second" id="b-acc">Accueil</button></div>';
+  h += '<button class="bouton second" id="b-acc">🏠</button></div>';
   go(h);
   var a = dm;
   bind("b-again", function () { startMots(a.mi, a.ti, a.gi); });
@@ -3249,7 +3298,7 @@ function showSync(msg) {
     h += '<p class="petit" id="sy-msg">' + esc(msg || "") + '</p>';
     h += '<button class="bouton" id="b-sy-ok">Valider</button>';
   }
-  h += '</div><button class="bouton second" id="b-sy-ret">Accueil</button>';
+  h += '</div><button class="bouton second" id="b-sy-ret">🏠</button>';
   go(h);
   bind("b-sy-ret", function () { syncChanger = false; showHome(); });
   bind("b-sy-now", function () { syncPull(function (ok) { showSync(ok ? "Synchronisé." : "Pas de connexion pour le moment."); }); });
