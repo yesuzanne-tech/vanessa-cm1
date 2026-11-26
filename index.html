@@ -722,6 +722,958 @@ function themesDictees() {
   return r;
 }
 
+/* ---------- Leçons de maths : cahier Num 0 à Num 17 ---------- */
+/* horsQuiz = true : la leçon et ses exercices sont disponibles, mais ses questions ne sont pas dans le quiz du jour */
+function LN(id, titre, resume, exos, hq) { return { id: id, titre: titre, poids: 1, resume: resume + NOTE_LECON, exos: exos, horsQuiz: !!hq }; }
+function EX(titre, qs) { return { titre: titre, qs: qs }; }
+
+var LECON_NUM0 = LN("num0", "Num 0 · Petits rappels sur les chiffres et les nombres",
+  "Notre système de numération est décimal : il est basé sur un regroupement par 10.\n\n1 unité = 1\n10 unités = 1 dizaine = 10\n10 dizaines = 1 centaine = 100 unités = 100\n10 centaines = 1 millier = 100 dizaines = 1 000 unités = 1 000\n\nIl y a 10 chiffres : 0, 1, 2, 3, 4, 5, 6, 7, 8 et 9. Un nombre est composé d'au moins 1 chiffre.\n5 est un nombre à 1 chiffre. 4 237 est un nombre à 4 chiffres.\n\nPour connaître la valeur des chiffres dans un nombre, on utilise un tableau de numération (M, C, D, U).\n\nDans le nombre 1 234 :\n- Le chiffre des unités est 4, mais le nombre d'unités est 1 234.\n- Le chiffre des dizaines est 3, mais le nombre de dizaines est 123.\n- Le chiffre des centaines est 2, mais le nombre de centaines est 12.\n- Le chiffre des unités de mille est 1 et le nombre de milliers est 1.",
+  [
+    EX("Le système décimal", [
+      Q("10 unités, c'est :", ["1 dizaine", "1 centaine", "1 millier"], 0, "10 unités = 1 dizaine."),
+      Q("10 dizaines, c'est :", ["1 millier", "1 centaine", "1 unité"], 1, "10 dizaines = 1 centaine = 100."),
+      Q("10 centaines, c'est :", ["1 dizaine", "1 centaine", "1 millier"], 2, "10 centaines = 1 millier = 1 000."),
+      Q("Combien y a-t-il de chiffres dans notre système de numération ?", ["9", "10", "100"], 1, "0, 1, 2, 3, 4, 5, 6, 7, 8, 9 : ça fait 10 chiffres."),
+      Q("Vrai ou faux : 1 000 unités = 100 dizaines.", VF, 0, "1 000 : 10 = 100, donc 1 000 unités = 100 dizaines.")
+    ]),
+    EX("Chiffre ou nombre ?", [
+      Q("4 237 est un nombre à :", ["2 chiffres", "4 chiffres", "7 chiffres"], 1, "4, 2, 3, 7 : quatre chiffres."),
+      Q("Dans 1 234, le chiffre des dizaines est :", ["2", "3", "4"], 1, "1 | 2 | 3 | 4 : M, C, D, U. Les dizaines : 3."),
+      Q("Dans 1 234, le nombre de dizaines est :", ["3", "12", "123"], 2, "1 234 : 10 = 123 paquets de 10."),
+      Q("Dans 1 234, le nombre de centaines est :", ["2", "12", "123"], 1, "1 234 contient 12 paquets de 100."),
+      Q("Dans 1 234, le nombre d'unités est :", ["4", "34", "1 234"], 2, "Il y a 1 234 unités en tout."),
+      Q("Vrai ou faux : 5 est un nombre à 1 chiffre.", VF, 0, "5 s'écrit avec un seul chiffre.")
+    ])
+  ], true);
+
+var LECON_NUM1 = LN("num1", "Num 1 · Revoir les nombres jusqu'à 9 999",
+  "Un nombre peut s'écrire de différentes façons :\n- en chiffres : 8 352\n- en lettres : huit-mille-trois-cent-cinquante-deux\n- sous la forme d'une décomposition : 8 352 = 8 milliers, 3 centaines, 5 dizaines et 2 unités\nou 8 352 = (8 × 1 000) + (3 × 100) + (5 × 10) + 2\n\nPour comparer des nombres :\n- on compare leur nombre de chiffres. Ex : 5 002 (4 chiffres) > 800 (3 chiffres)\n- s'ils ont autant de chiffres, on compare les chiffres un par un, en commençant par la gauche. Ex : 4 562 < 5 562 car 4 < 5\n\nOn peut encadrer un nombre :\n- à la dizaine près : 4 560 < 4 562 < 4 570\n- à la centaine près : 4 500 < 4 562 < 4 600\n\nRappel pour écrire les nombres en lettres : je mets un « s » à « cent » et « quatre-vingt » quand il n'y a rien après (400 : quatre-cents, mais 403 : quatre-cent-trois ; 180 : cent-quatre-vingts, mais 185 : cent-quatre-vingt-cinq). Je ne mets jamais de « s » à « mille » (3 000 : trois-mille). Exemple : 3 537 s'écrit trois-mille-cinq-cent-trente-sept.",
+  [
+    EX("Écrire et décomposer", [
+      Q("8 352 s'écrit en lettres :", ["huit-mille-trois-cent-cinquante-deux", "huit-cent-trois-mille-cinquante-deux", "huit-mille-trois-cents-cinq-deux"], 0, "8 000 + 300 + 50 + 2."),
+      Q("8 352 = (8 × 1 000) + (3 × 100) + (5 × 10) + ...", ["2", "20", "200"], 0, "Il reste 2 unités."),
+      Q("4 000 + 600 + 70 + 5 =", ["4 675", "4 765", "4 567"], 0, "4 milliers, 6 centaines, 7 dizaines, 5 unités."),
+      Q("403 s'écrit en lettres :", ["quatre-cent-trois", "quatre-cents-trois", "quatre-cent-trois-s"], 0, "« cent » ne prend pas de « s » quand il y a un nombre après."),
+      Q("400 s'écrit en lettres :", ["quatre-cent", "quatre-cents", "quatre-cens"], 1, "Rien après « cent » : on met un « s »."),
+      Q("3 000 s'écrit en lettres :", ["trois-milles", "trois-mille", "troi-mille"], 1, "On ne met jamais de « s » à « mille »."),
+      Q("185 s'écrit en lettres :", ["cent-quatre-vingts-cinq", "cent-quatre-vingt-cinq", "cent-quatre-vingt-cinquante"], 1, "Il y a un nombre après « quatre-vingt » : pas de « s ».")
+    ]),
+    EX("Comparer et encadrer", [
+      Q("Quel nombre est le plus grand ?", ["800", "5 002", "999"], 1, "5 002 a 4 chiffres, les autres 3."),
+      Q("4 562 ... 5 562", ["<", ">", "="], 0, "On regarde le chiffre des milliers : 4 < 5."),
+      Q("Quel signe va entre 7 380 et 7 308 ?", ["<", ">", "="], 1, "Mêmes milliers et centaines : 8 dizaines > 0 dizaine."),
+      Q("4 562 encadré à la dizaine près :", ["4 560 < 4 562 < 4 570", "4 500 < 4 562 < 4 600", "4 550 < 4 562 < 4 560"], 0, "La dizaine juste avant est 4 560, la dizaine juste après est 4 570."),
+      Q("4 562 encadré à la centaine près :", ["4 560 < 4 562 < 4 570", "4 500 < 4 562 < 4 600", "4 000 < 4 562 < 5 000"], 1, "La centaine juste avant est 4 500, la suivante est 4 600."),
+      Q("Vrai ou faux : 5 002 > 800.", VF, 0, "5 002 a plus de chiffres que 800.")
+    ])
+  ], false);
+
+var LECON_NUM2 = LN("num2", "Num 2 · Découvrir les fractions",
+  "Lorsque l'on partage une unité en parts égales, chaque part représente une fraction de cette unité.\n\nEx : l'unité est partagée en 4 parts égales. La partie grise est 1/4 : c'est une part sur quatre.\n\n1/4 : 1 est le numérateur. Il indique que l'on a pris une part. 4 est le dénominateur. Il indique que l'unité est partagée en 4 parts égales.\n\n1/2 se lit un demi.\n1/3 se lit un tiers.\n3/4 se lit trois quarts.\n1/10 se lit un dixième.\n\nPour lire les autres fractions, on utilise le suffixe -ième. Ex : 4/8 se lit quatre huitièmes.\n\nPour mesurer des longueurs avec une bande unité, je dois partager l'unité en 2, 4... parts égales. Puis je reporte l'unité ou des parts d'unité sur la longueur de la bande à mesurer. Ex : 3/2 u = 1 u + 1/2 u.",
+  [
+    EX("Numérateur et dénominateur", [
+      Q("Dans 3/4, le numérateur est :", ["3", "4", "7"], 0, "Le numérateur est le nombre du haut."),
+      Q("Dans 3/4, le dénominateur est :", ["3", "4", "7"], 1, "Le dénominateur est le nombre du bas."),
+      Q("Le dénominateur indique :", ["le nombre de parts prises", "le nombre de parts égales de l'unité", "le nombre d'unités"], 1, "4 = l'unité est partagée en 4 parts égales."),
+      Q("Le numérateur indique :", ["le nombre de parts prises", "le nombre de parts égales de l'unité", "le nombre d'unités"], 0, "3 = on a pris 3 parts."),
+      Q("Un cercle est partagé en 4 parts égales. On en colorie 1. La fraction est :", ["4/1", "1/4", "1/5"], 1, "Une part sur quatre.")
+    ]),
+    EX("Lire les fractions", [
+      Q("1/2 se lit :", ["un deuxième", "un demi", "un double"], 1, "1/2 se lit un demi."),
+      Q("1/3 se lit :", ["un tiers", "un troisième", "un trois"], 0, "1/3 se lit un tiers."),
+      Q("3/4 se lit :", ["trois quatrièmes", "trois quarts", "quatre tiers"], 1, "3/4 se lit trois quarts."),
+      Q("1/10 se lit :", ["un dixième", "un dixain", "un dix"], 0, "1/10 se lit un dixième."),
+      Q("4/8 se lit :", ["quatre huit", "quatre huitièmes", "huit quarts"], 1, "On ajoute le suffixe -ième."),
+      Q("Vrai ou faux : 3/2 u = 1 u + 1/2 u.", VF, 0, "3/2 = 2/2 + 1/2 = 1 u + 1/2 u.")
+    ])
+  ], false);
+
+var LECON_NUM3 = LN("num3", "Num 3 · Utiliser des fractions dans des situations concrètes",
+  "On utilise des fractions dans la vie courante pour exprimer et calculer :\n- Une quantité : 1/2 d'une tablette de 18 carrés de chocolat, c'est 18 divisé par 2 = 9 carrés.\n- Une aire : la partie bleue correspond à 1/4 de l'aire du disque.\n- Une longueur : 1/3 d'un trajet de 900 km, c'est 300 km.\n- Une masse : 1/2 (la moitié) d'un poulet de 1 200 g, c'est 600 g.\n- Une contenance : 1/4 de litre, c'est 1 000 mL divisés par 4 = 250 mL.\n- Une durée : 1/4 d'heure, c'est 60 minutes divisées par 4 donc 15 min.",
+  [
+    EX("Fractions de quantités", [
+      Q("1/2 d'une tablette de 18 carrés de chocolat, c'est :", ["6 carrés", "9 carrés", "36 carrés"], 1, "18 : 2 = 9."),
+      Q("1/3 d'un trajet de 900 km, c'est :", ["300 km", "450 km", "3 km"], 0, "900 : 3 = 300."),
+      Q("La moitié d'un poulet de 1 200 g, c'est :", ["300 g", "600 g", "1 000 g"], 1, "1 200 : 2 = 600."),
+      Q("1/4 de litre, c'est :", ["400 mL", "250 mL", "25 mL"], 1, "1 000 mL : 4 = 250 mL."),
+      Q("1/4 d'heure, c'est :", ["15 min", "25 min", "40 min"], 0, "60 : 4 = 15 minutes.")
+    ]),
+    EX("Dans la vie courante", [
+      Q("1/2 de 20 euros, c'est :", ["5 euros", "10 euros", "40 euros"], 1, "20 : 2 = 10."),
+      Q("1/4 de 20 euros, c'est :", ["5 euros", "10 euros", "80 euros"], 0, "20 : 4 = 5."),
+      Q("1/3 de 12 billes, c'est :", ["3 billes", "4 billes", "36 billes"], 1, "12 : 3 = 4."),
+      Q("Une demi-heure, c'est :", ["15 min", "30 min", "45 min"], 1, "60 : 2 = 30."),
+      Q("1/2 litre, c'est :", ["500 mL", "200 mL", "50 mL"], 0, "1 000 : 2 = 500 mL."),
+      Q("Vrai ou faux : 1/4 d'un disque, c'est une part sur quatre parts égales.", VF, 0, "Oui, c'est le sens du dénominateur 4.")
+    ])
+  ], false);
+
+var LECON_NUM4 = LN("num4", "Num 4 · Repérer, placer et encadrer des fractions sur une demi-droite graduée",
+  "Sur une demi-droite graduée, on peut repérer et placer des fractions.\n\n4/4 = 1\n5/4 = 1 + 1/4\n8/4 = 2\n\nSi l'unité est partagée en 4, chaque graduation vaut 1/4 : on a 1/4, 2/4, 3/4, 4/4 (= 1), 5/4, 6/4, 7/4, 8/4 (= 2).\n\nOn peut aussi encadrer des fractions entre deux nombres entiers qui se suivent :\n1/2 est compris entre 0 et 1.\n5/4 est compris entre 1 et 2.",
+  [
+    EX("Placer sur la droite graduée", [
+      Q("Unité partagée en 4. 4/4 correspond au nombre :", ["0", "1", "2"], 1, "4/4 = 1."),
+      Q("Unité partagée en 4. 8/4 correspond au nombre :", ["1", "2", "4"], 1, "8/4 = 2."),
+      Q("5/4 =", ["1 + 1/4", "2 + 1/4", "5 + 4"], 0, "5/4 = 4/4 + 1/4."),
+      Q("Quelle fraction est juste après 4/4 ?", ["3/4", "5/4", "6/4"], 1, "4/4 puis 5/4."),
+      Q("Quelle fraction est la plus proche de 0 ?", ["1/4", "4/4", "5/4"], 0, "1/4 est avant 1.")
+    ]),
+    EX("Encadrer des fractions", [
+      Q("1/2 est compris entre :", ["0 et 1", "1 et 2", "2 et 3"], 0, "1/2 est plus petit que 1."),
+      Q("5/4 est compris entre :", ["0 et 1", "1 et 2", "2 et 3"], 1, "5/4 = 1 + 1/4."),
+      Q("3/2 est compris entre :", ["0 et 1", "1 et 2", "2 et 3"], 1, "3/2 = 1 + 1/2."),
+      Q("7/4 est compris entre :", ["0 et 1", "1 et 2", "2 et 3"], 1, "7/4 = 1 + 3/4."),
+      Q("Vrai ou faux : 3/4 est plus grand que 1.", VF, 1, "3 est plus petit que 4 : 3/4 < 1.")
+    ])
+  ], true);
+
+var LECON_NUM5 = LN("num5", "Num 5 · Se représenter des fractions égales",
+  "Pour savoir si deux fractions sont égales, il faut réfléchir à ce qu'elles représentent.\n\n1 part de pizza coupée en 4 parts égales représente la même portion que 2 parts d'une pizza coupée en 8 parts égales. Donc 1/4 = 2/8.\n\n1/3 = 2/6 car dans 1 tiers d'unité il y a 2 sixièmes d'unité.\n1/2 = 5/10 car dans un demi il y a 5 dixièmes d'unité.\n12/10 = 120/100 car dans 1 dixième d'unité il y a 10 centièmes d'unité, donc dans 12 dixièmes il y a 120 centièmes.\n\nAutres exemples : 4/4 = 1 u, 5/4 = 1 u + 1/4, 8/4 = 2 u.",
+  [
+    EX("Fractions égales", [
+      Q("1/4 = ?/8", ["1", "2", "4"], 1, "1 quart = 2 huitièmes."),
+      Q("1/3 = ?/6", ["2", "3", "6"], 0, "1 tiers = 2 sixièmes."),
+      Q("1/2 = ?/10", ["2", "5", "10"], 1, "1 demi = 5 dixièmes."),
+      Q("12/10 = ?/100", ["12", "102", "120"], 2, "1 dixième = 10 centièmes : 12 × 10 = 120."),
+      Q("Quelle fraction est égale à 1 ?", ["4/4", "4/1", "1/4"], 0, "4 parts sur 4 : toute l'unité.")
+    ]),
+    EX("Vrai ou faux", [
+      Q("2/8 = 1/4", VF, 0, "2 huitièmes = 1 quart."),
+      Q("1/2 = 2/3", VF, 1, "1 demi n'est pas égal à 2 tiers."),
+      Q("8/4 = 2", VF, 0, "8 quarts = 2 unités."),
+      Q("5/4 = 1 u + 1/4", VF, 0, "5/4 = 4/4 + 1/4."),
+      Q("1/2 = 5/10", VF, 0, "Dans un demi, il y a 5 dixièmes.")
+    ])
+  ], true);
+
+var LECON_NUM6 = LN("num6", "Num 6 · Se représenter des fractions simples",
+  "Les fractions sont des nombres qui permettent d'exprimer des quantités qui ne sont pas entières. On peut décomposer une fraction sous la forme d'un nombre entier et d'une fraction inférieure à 1.\n\nExemple 1 : un gâteau entier et trois quarts d'un autre gâteau se note 1 u + 3/4 ou 7/4 ou 14/8.\n\nExemple 2 : un carré entier (1 unité) et une part d'un carré coupé en 8 parts égales se note 1 u + 1/8 ou 9/8.\n\nLes fractions permettent de mesurer la longueur d'un segment quand celle-ci n'est pas un nombre entier. Exemple : EF = 1 u + 1/2 u.",
+  [
+    EX("Écrire des quantités", [
+      Q("1 gâteau entier et 3/4 d'un autre gâteau :", ["1 u + 3/4", "3 u + 1/4", "4/3"], 0, "1 entier et 3 quarts."),
+      Q("1 u + 3/4 s'écrit aussi :", ["4/4", "7/4", "3/4"], 1, "1 u = 4/4, donc 4/4 + 3/4 = 7/4."),
+      Q("1 carré entier et 1 part d'un carré coupé en 8 :", ["1 u + 1/8", "8 u + 1", "1/9"], 0, "1 entier et 1 huitième."),
+      Q("1 u + 1/8 s'écrit aussi :", ["2/8", "9/8", "11/8"], 1, "8/8 + 1/8 = 9/8."),
+      Q("Un segment mesure 1 u + 1/2 u. C'est :", ["entre 0 et 1 unité", "entre 1 et 2 unités", "exactement 2 unités"], 1, "1 u + 1/2 u = 3/2 u, entre 1 et 2.")
+    ]),
+    EX("À quoi servent les fractions ?", [
+      Q("Les fractions servent à exprimer :", ["des quantités non entières", "uniquement des nombres entiers", "des lettres"], 0, "Elles expriment des quantités qui ne sont pas entières."),
+      Q("On peut décomposer une fraction en :", ["un entier et une fraction inférieure à 1", "deux entiers", "un chiffre et une lettre"], 0, "Ex : 7/4 = 1 + 3/4."),
+      Q("7/4 est égal à :", ["1 + 3/4", "3 + 1/4", "7 + 4"], 0, "7 = 4 + 3."),
+      Q("14/8 est égal à :", ["7/4", "6/4", "1/2"], 0, "14/8 = 7/4 (on divise par 2)."),
+      Q("Vrai ou faux : 9/8 est plus grand que 1.", VF, 0, "9 > 8 : on a plus qu'une unité.")
+    ])
+  ], true);
+
+var LECON_NUM7 = LN("num7", "Num 7 · La partie entière d'une fraction et la décomposition d'une fraction",
+  "La partie entière d'une fraction est le nombre d'unités qu'elle contient.\n\nDeux gâteaux entiers et 3 dixièmes d'un autre gâteau : 2 u + 3/10 ou 23/10.\nDeux tablettes et 8 dixièmes : 1 u + 8/10 ou 18/10 (selon l'exemple du cahier).\n\nPour trouver la partie entière d'une fraction, je peux m'aider d'une droite graduée ou diviser le numérateur par le dénominateur.\n\nDécomposer une fraction, c'est l'écrire sous la forme d'une somme avec un entier et une fraction inférieure à une unité.\nEx 1 : 9/4 = 8/4 + 1/4 = 2 + 1/4 (9 parts de tartes = 2 tartes + 1 quart de part).\nEx 2 : 7/3 u = 3/3 u + 3/3 u + 1/3 u = 1 u + 1 u + 1/3 u = 2 u + 1/3 u.",
+  [
+    EX("Partie entière", [
+      Q("2 u + 3/10 s'écrit aussi :", ["23/10", "5/10", "2/10"], 0, "2 u = 20/10, plus 3/10 = 23/10."),
+      Q("La partie entière de 9/4 est :", ["1", "2", "4"], 1, "9 : 4 = 2 reste 1."),
+      Q("La partie entière de 7/3 est :", ["1", "2", "3"], 1, "7 : 3 = 2 reste 1."),
+      Q("La partie entière de 23/10 est :", ["2", "3", "23"], 0, "23 : 10 = 2 reste 3."),
+      Q("Pour trouver la partie entière d'une fraction, je peux :", ["diviser le numérateur par le dénominateur", "additionner les deux nombres", "multiplier les deux nombres"], 0, "Le quotient donne le nombre d'unités entières.")
+    ]),
+    EX("Décomposer", [
+      Q("9/4 =", ["2 + 1/4", "1 + 2/4", "3 + 1/4"], 0, "9/4 = 8/4 + 1/4 = 2 + 1/4."),
+      Q("7/3 =", ["2 + 1/3", "1 + 4/3", "3 + 1/3"], 0, "7/3 = 6/3 + 1/3 = 2 + 1/3."),
+      Q("18/10 =", ["1 + 8/10", "8 + 1/10", "10 + 8/10"], 0, "18/10 = 10/10 + 8/10."),
+      Q("5/2 =", ["2 + 1/2", "1 + 4/2", "5 + 2"], 0, "5/2 = 4/2 + 1/2 = 2 + 1/2."),
+      Q("Vrai ou faux : 2 + 3/10 = 23/10.", VF, 0, "2 = 20/10, donc 20/10 + 3/10 = 23/10.")
+    ])
+  ], true);
+
+var LECON_NUM8 = LN("num8", "Num 8 · Ranger et comparer des fractions",
+  "Pour ranger des fractions dans l'ordre croissant ou décroissant, on peut les placer sur une droite graduée : 1/4 < 4/4 < 5/4 < 8/4.\n\nCertaines fractions sont égales à un nombre entier : 3/3 = 1 ou 12/3 = 4.\nCertaines fractions sont égales à d'autres fractions : 1/2 = 2/4 = 5/10.\n\nOn peut comparer des fractions par rapport à l'unité :\n- Si le numérateur est inférieur au dénominateur, la fraction est inférieure à 1. Ex : 2/3 < 1.\n- Si le numérateur est égal au dénominateur, la fraction est égale à 1. Ex : 3/3 = 1, 10/10 = 1.\n- Si le numérateur est supérieur au dénominateur, la fraction est supérieure à 1. Ex : 4/3 > 1.\n\nOn peut comparer des fractions entre elles : si elles ont le même dénominateur, on compare le numérateur. Ex : 13/8 > 5/8 car 13 > 5.",
+  [
+    EX("Comparer à l'unité", [
+      Q("2/3 est :", ["plus petit que 1", "égal à 1", "plus grand que 1"], 0, "2 < 3."),
+      Q("10/10 est :", ["plus petit que 1", "égal à 1", "plus grand que 1"], 1, "Numérateur = dénominateur."),
+      Q("4/3 est :", ["plus petit que 1", "égal à 1", "plus grand que 1"], 2, "4 > 3."),
+      Q("12/3 est égal à :", ["3", "4", "9"], 1, "12 : 3 = 4."),
+      Q("Vrai ou faux : 3/3 = 1.", VF, 0, "3 tiers = 1 unité.")
+    ]),
+    EX("Comparer entre elles", [
+      Q("13/8 ... 5/8", ["<", ">", "="], 1, "Même dénominateur : 13 > 5."),
+      Q("Quelle fraction est la plus grande ?", ["3/7", "5/7", "2/7"], 1, "Même dénominateur : le plus grand numérateur gagne."),
+      Q("Rangées dans l'ordre croissant :", ["1/4 < 4/4 < 5/4 < 8/4", "8/4 < 5/4 < 4/4 < 1/4", "4/4 < 1/4 < 8/4 < 5/4"], 0, "On range du plus petit au plus grand."),
+      Q("1/2 est égal à :", ["2/4", "1/4", "2/3"], 0, "1 demi = 2 quarts."),
+      Q("Vrai ou faux : 5/8 > 13/8.", VF, 1, "5 < 13 : 5/8 < 13/8.")
+    ])
+  ], true);
+
+var LECON_NUM9 = LN("num9", "Num 9 · Découvrir les fractions décimales",
+  "Une fraction qui peut s'écrire avec un dénominateur égal à 10, 100... est une fraction décimale.\n\nQuand l'unité est partagée en 10 parts égales, chaque part est 1/10 (un dixième) de l'unité. 6/10 se lit « six dixièmes ».\n\nQuand l'unité est partagée en 100 parts égales, chaque part est 1/100 (un centième) de l'unité. 93/100 se lit « quatre-vingt-treize centièmes ».\n\nOn peut décomposer une fraction décimale sous la forme d'un nombre entier et d'une fraction inférieure à 1.\nEx : 124/100 = 100/100 + 20/100 + 4/100 = 1 + 2/10 + 4/100.\n\nComme je sais que 100/100 = 1, je peux simplifier la fraction en la somme d'un nombre entier et d'une fraction. Je peux aussi simplifier : 20/100 = (2 × 10)/(10 × 10) = 2/10.",
+  [
+    EX("Dixièmes et centièmes", [
+      Q("Une fraction décimale a pour dénominateur :", ["3, 4 ou 5", "10, 100...", "2 ou 7"], 1, "10, 100, 1 000..."),
+      Q("6/10 se lit :", ["six dixièmes", "dix sixièmes", "six dizaines"], 0, "On lit le nombre puis le dénominateur avec -ième."),
+      Q("93/100 se lit :", ["quatre-vingt-treize centièmes", "quatre-vingt-treize dixièmes", "cent quatre-vingt-treize"], 0, "Le dénominateur 100 donne « centièmes »."),
+      Q("1/100 se lit :", ["un dixième", "un centième", "un millième"], 1, "100 parts égales : un centième."),
+      Q("20/100 est égal à :", ["2/10", "20/10", "2/100"], 0, "On divise le haut et le bas par 10.")
+    ]),
+    EX("Décomposer", [
+      Q("100/100 est égal à :", ["0", "1", "100"], 1, "Toute l'unité."),
+      Q("124/100 =", ["1 + 2/10 + 4/100", "12 + 4/100", "1 + 24/10"], 0, "124/100 = 100/100 + 20/100 + 4/100."),
+      Q("Dans 124/100, la partie entière est :", ["1", "12", "124"], 0, "100/100 = 1 entier."),
+      Q("Un dixième, c'est combien de centièmes ?", ["1", "10", "100"], 1, "1/10 = 10/100."),
+      Q("Vrai ou faux : 50/100 = 5/10.", VF, 0, "On divise le haut et le bas par 10.")
+    ])
+  ], true);
+
+var LECON_NUM10 = LN("num10", "Num 10 · Lire, écrire et décomposer les nombres jusqu'à 999 999",
+  "Pour lire et écrire des grands nombres, on regroupe les chiffres par classe, donc par 3, en partant de la droite. Chaque classe comprend les unités, les dizaines et les centaines.\n\nClasse des mille : centaines, dizaines, unités. Classe des unités : centaines, dizaines, unités.\n\nLe nombre 425 739 s'écrit : quatre-cent-vingt-cinq-mille-sept-cent-trente-neuf. On laisse un espace entre les classes. On ajoute le nom de la classe (mille).\n\nPour lire un nombre entier, on utilise les mots mille, million et milliard.\n\nValeur d'un chiffre :\n709 : le chiffre 7 vaut 7 centaines ou 700 unités.\n7 214 : le chiffre 7 vaut 7 milliers ou 7 000 unités.\n348 075 : le chiffre 7 vaut 7 dizaines ou 70 unités.\n47 015 300 : le chiffre 7 vaut 7 millions ou 7 000 000 d'unités.",
+  [
+    EX("Lire et écrire", [
+      Q("425 739 s'écrit en lettres :", ["quatre-cent-vingt-cinq-mille-sept-cent-trente-neuf", "quatre-cent-vingt-cinq-sept-cent-trente-neuf", "quatre-vingt-cinq-mille-sept-trente-neuf"], 0, "On ajoute « mille » entre les deux classes."),
+      Q("Pour lire un grand nombre, on regroupe les chiffres :", ["par 2", "par 3", "par 5"], 1, "Par classes de 3 chiffres, en partant de la droite."),
+      Q("Comment écrit-on 425739 avec les espaces ?", ["425 739", "42 57 39", "4 257 39"], 0, "On laisse un espace entre les classes."),
+      Q("La classe des mille est écrite :", ["à gauche de la classe des unités", "à droite de la classe des unités", "au milieu"], 0, "425 | 739 : mille puis unités."),
+      Q("Quel mot ajoute-t-on entre 425 et 739 ?", ["million", "mille", "milliard"], 1, "On ajoute le nom de la classe.")
+    ]),
+    EX("Valeur d'un chiffre", [
+      Q("Dans 709, le chiffre 7 vaut :", ["7 unités", "7 dizaines", "7 centaines"], 2, "700 unités = 7 centaines."),
+      Q("Dans 7 214, le chiffre 7 vaut :", ["7 centaines", "7 milliers", "7 dizaines"], 1, "7 000 unités."),
+      Q("Dans 348 075, le chiffre 7 vaut :", ["70 unités", "700 unités", "7 000 unités"], 0, "7 dizaines = 70 unités."),
+      Q("Dans 47 015 300, le chiffre 7 vaut :", ["7 000 unités", "7 000 000 d'unités", "700 000 unités"], 1, "7 millions."),
+      Q("Vrai ou faux : 7 000 unités = 7 milliers.", VF, 0, "Oui, 1 millier = 1 000 unités.")
+    ])
+  ], true);
+
+var LECON_NUM11 = LN("num11", "Num 11 · Décomposer les nombres entiers en unités de numération",
+  "Pour décomposer un nombre entier, tu peux utiliser le tableau de numération. Pour certaines décompositions, tu peux écrire plusieurs chiffres dans une même case.\n\nExemple 1 : 425 739 = 4 centaines de milliers, 2 dizaines de milliers, 5 milliers, 7 centaines, 3 dizaines, 9 unités.\n→ (4 × 100 000) + (2 × 10 000) + (5 × 1 000) + (7 × 100) + (3 × 10) + 9\nou 425 milliers, 7 centaines, 3 dizaines, 9 unités.\n→ 425 739 = (425 × 1 000) + (7 × 100) + (3 × 10) + (9 × 1)\n\nExemple 2 : trois décompositions de 348 075 :\nA : 3 centaines de milliers, 4 dizaines de milliers, 8 milliers, 7 dizaines, 5 unités = (3 × 100 000) + (4 × 10 000) + (8 × 1 000) + (7 × 10) + 5\nB : 348 milliers, 75 unités = (348 × 1 000) + 75\nC : 34 dizaines de milliers, 8 milliers, 75 unités = (34 × 10 000) + (8 × 1 000) + 75",
+  [
+    EX("Décompositions", [
+      Q("425 739 = 4 centaines de milliers, 2 dizaines de milliers, 5 milliers, 7 centaines, 3 dizaines, ...", ["9 unités", "9 dizaines", "9 milliers"], 0, "Le dernier chiffre est celui des unités."),
+      Q("425 739 = 425 milliers, 7 centaines, 3 dizaines, ...", ["9 unités", "39 unités", "739 unités"], 0, "425 milliers + 7 centaines + 3 dizaines + 9 unités."),
+      Q("425 739 = (425 × 1 000) + ...", ["739", "(7 × 100) + (3 × 10) + 9", "7 + 3 + 9"], 1, "739 = 700 + 30 + 9."),
+      Q("348 075 = 348 milliers et ...", ["75 unités", "75 dizaines", "750 unités"], 0, "348 075 = 348 000 + 75."),
+      Q("348 075 = (34 × 10 000) + (8 × 1 000) + ...", ["75", "750", "7 500"], 0, "340 000 + 8 000 + 75.")
+    ]),
+    EX("Décomposer d'autres nombres", [
+      Q("127 629 = (1 × 100 000) + (2 × 10 000) + (7 × 1 000) + ...", ["(6 × 100) + (2 × 10) + 9", "(6 × 10) + (2 × 1) + 9", "6 + 2 + 9"], 0, "629 = 600 + 20 + 9."),
+      Q("127 629 = 127 milliers et ...", ["629 unités", "6 290 unités", "62 unités"], 0, "127 629 = 127 000 + 629."),
+      Q("127 629 = (12 × 10 000) + ...", ["(7 × 1 000) + 629", "7 000 000 + 629", "(7 × 100) + 629"], 0, "120 000 + 7 000 + 629."),
+      Q("Combien y a-t-il de dizaines de milliers dans 348 075 ?", ["3", "34", "348"], 1, "348 075 : 10 000 = 34 paquets."),
+      Q("Vrai ou faux : 348 075 = (348 × 1 000) + 75.", VF, 0, "348 000 + 75 = 348 075.")
+    ])
+  ], true);
+
+var LECON_NUM12 = LN("num12", "Num 12 · Placer, encadrer, comparer, ranger les nombres jusqu'à 999 999",
+  "On peut placer des nombres sur une demi-droite graduée entre des nombres repères et les intercaler (de 100 en 100, de 1 000 en 1 000, de 10 000 en 10 000).\n\nOn peut comparer deux nombres :\n- on compare leur nombre de chiffres. Ex : 75 002 (5 chiffres) > 7 800 (4 chiffres)\n- si les nombres ont autant de chiffres, on compare chaque chiffre en commençant par le rang le plus élevé (par la gauche). Ex : 456 230 > 455 253 (c'est l'unité de mille qui permet de comparer).\n\nOn peut ranger les nombres dans l'ordre croissant (du plus petit au plus grand) : 480 263 < 490 263 < 496 532. Dans l'ordre décroissant (du plus grand au plus petit) : 496 532 > 490 263 > 480 263.\n\nOn peut encadrer un nombre :\n- Au millier près : 455 000 < 455 253 < 456 000\n- À la dizaine de mille près : 450 000 < 455 253 < 460 000\n- À l'unité près : 455 252 < 455 253 < 455 254\n\nOn peut arrondir un nombre. L'arrondi de 15 725 au millier près est 16 000 car 15 725 est plus proche de 16 000 que de 15 000. L'arrondi de 15 725 à la dizaine près est 15 730 car 15 725 est aussi proche de 15 730 que de 15 720 mais, en mathématiques, il faut choisir par convention l'arrondi le plus grand des deux.",
+  [
+    EX("Comparer et ranger", [
+      Q("75 002 ... 7 800", [">", "<", "="], 0, "75 002 a 5 chiffres, 7 800 en a 4."),
+      Q("456 230 ... 455 253", [">", "<", "="], 0, "Mêmes centaines de milliers et dizaines de milliers : 6 milliers > 5 milliers."),
+      Q("Ordre croissant :", ["480 263 < 490 263 < 496 532", "496 532 < 490 263 < 480 263", "490 263 < 480 263 < 496 532"], 0, "Du plus petit au plus grand."),
+      Q("Ordre décroissant :", ["496 532 > 490 263 > 480 263", "480 263 > 490 263 > 496 532", "490 263 > 496 532 > 480 263"], 0, "Du plus grand au plus petit."),
+      Q("Quel nombre est le plus grand ?", ["99 999", "100 000", "9 999"], 1, "100 000 a 6 chiffres.")
+    ]),
+    EX("Encadrer et arrondir", [
+      Q("455 253 encadré au millier près :", ["455 000 < 455 253 < 456 000", "450 000 < 455 253 < 460 000", "455 200 < 455 253 < 455 300"], 0, "Le millier d'avant est 455 000, celui d'après est 456 000."),
+      Q("455 253 encadré à la dizaine de mille près :", ["455 000 < 455 253 < 456 000", "450 000 < 455 253 < 460 000", "400 000 < 455 253 < 500 000"], 1, "450 000 puis 460 000."),
+      Q("455 253 encadré à l'unité près :", ["455 252 < 455 253 < 455 254", "455 250 < 455 253 < 455 260", "455 253 < 455 254 < 455 255"], 0, "On prend l'unité juste avant et juste après."),
+      Q("L'arrondi de 15 725 au millier près est :", ["15 000", "16 000", "15 700"], 1, "15 725 est plus proche de 16 000."),
+      Q("L'arrondi de 15 725 à la dizaine près est :", ["15 720", "15 730", "15 700"], 1, "Entre 15 720 et 15 730, par convention on prend le plus grand."),
+      Q("Vrai ou faux : 450 000 < 455 253 < 460 000 est un encadrement à la dizaine de mille près.", VF, 0, "450 000 et 460 000 sont deux dizaines de mille qui se suivent.")
+    ])
+  ], true);
+
+var LECON_NUM13 = LN("num13", "Num 13 · Lire, écrire, placer, encadrer, comparer, ranger les nombres jusqu'à 999 999 999",
+  "Rappel : pour lire et écrire des grands nombres, on regroupe les chiffres par classe, donc par 3, en partant de la droite. Classe des millions, classe des mille, classe des unités.\n\nLe nombre 25 632 739 se lit et s'écrit : vingt-cinq-millions-six-cent-trente-deux-mille-sept-cent-trente-neuf. On laisse un espace entre les classes et on ajoute le nom de la classe.\n\nPour lire un nombre entier, on utilise les mots mille, million et milliard.\n\nOn peut placer des nombres sur une demi-droite graduée et les intercaler (45 500 000 entre 45 000 000 et 46 000 000).\n\nPour comparer et ranger des nombres :\n- On compare leur nombre de chiffres. Ex : 2 575 002 (7 chiffres) > 207 800 (6 chiffres)\n- Si les nombres ont autant de chiffres, on compare chaque chiffre en partant de la gauche. Ex : 456 230 000 > 455 253 000\n\nOn peut encadrer un nombre :\n- À la centaine de mille près : 854 400 000 < 854 455 253 < 854 500 000\n- Au million près : 854 000 000 < 854 455 253 < 855 000 000",
+  [
+    EX("Lire et comparer", [
+      Q("25 632 739 contient la classe des :", ["millions, mille, unités", "mille, unités seulement", "milliards seulement"], 0, "25 | 632 | 739."),
+      Q("Dans 25 632 739, le mot « million » apparaît après :", ["vingt-cinq", "six-cent-trente-deux", "sept-cent-trente-neuf"], 0, "vingt-cinq-millions-..."),
+      Q("2 575 002 ... 207 800", [">", "<", "="], 0, "7 chiffres contre 6 chiffres."),
+      Q("456 230 000 ... 455 253 000", [">", "<", "="], 0, "456 > 455."),
+      Q("Quel nombre est le plus grand ?", ["999 999", "1 000 000", "99 999 999"], 2, "99 999 999 a 8 chiffres, 1 000 000 en a 7.")
+    ]),
+    EX("Placer et encadrer", [
+      Q("45 500 000 se place entre :", ["45 000 000 et 46 000 000", "46 000 000 et 47 000 000", "44 000 000 et 45 000 000"], 0, "45 000 000 < 45 500 000 < 46 000 000."),
+      Q("854 455 253 encadré à la centaine de mille près :", ["854 400 000 < 854 455 253 < 854 500 000", "854 000 000 < 854 455 253 < 855 000 000", "854 450 000 < 854 455 253 < 854 460 000"], 0, "On encadre avec deux centaines de mille qui se suivent."),
+      Q("854 455 253 encadré au million près :", ["854 400 000 < 854 455 253 < 854 500 000", "854 000 000 < 854 455 253 < 855 000 000", "850 000 000 < 854 455 253 < 860 000 000"], 1, "854 millions puis 855 millions."),
+      Q("1 million, c'est :", ["100 000", "1 000 000", "10 000 000"], 1, "1 million = 1 000 000."),
+      Q("Vrai ou faux : on laisse un espace entre les classes quand on écrit un nombre en chiffres.", VF, 0, "Ex : 25 632 739.")
+    ])
+  ], true);
+
+var LECON_NUM14 = LN("num14", "Num 14 · Passer de l'écriture fractionnaire aux nombres décimaux",
+  "On peut écrire une fraction décimale sous la forme d'un nombre à virgule : c'est un nombre décimal.\n\nEx 1 : 12/10 = 10/10 + 2/10 = 1 + 2/10 = 1,2\nEx 2 : 128/100 = 100/100 + 20/100 + 8/100 = 1 + 2/10 + 8/100 = 1,28\n\nLa virgule sépare la partie entière et la partie décimale du nombre.\n\nÀ l'inverse, on peut écrire une fraction décimale à partir d'un nombre décimal. Ex : 8,37 = 8 + 0,3 + 0,07 = 8 + 3/10 + 7/100 = 837/100.\n\nExemple à faire : 358/100 = 3 + 5/10 + 8/100 = 3,58.",
+  [
+    EX("Fraction vers nombre décimal", [
+      Q("12/10 =", ["1,2", "12,10", "0,12"], 0, "12/10 = 1 + 2/10 = 1,2."),
+      Q("128/100 =", ["1,28", "12,8", "128,100"], 0, "128/100 = 1 + 2/10 + 8/100."),
+      Q("358/100 =", ["3,58", "35,8", "0,358"], 0, "358/100 = 3 + 5/10 + 8/100."),
+      Q("5/10 =", ["5", "0,5", "0,05"], 1, "5 dixièmes = 0,5."),
+      Q("7/100 =", ["0,7", "0,07", "7,0"], 1, "7 centièmes = 0,07.")
+    ]),
+    EX("Nombre décimal vers fraction", [
+      Q("8,37 = 8 + 3/10 + ...", ["7/100", "7/10", "37/100"], 0, "Le 7 est au rang des centièmes."),
+      Q("8,37 s'écrit aussi :", ["837/100", "83/7", "8,37/10"], 0, "8,37 = 837 centièmes."),
+      Q("1,2 s'écrit aussi :", ["12/10", "1/2", "12/100"], 0, "1,2 = 12 dixièmes."),
+      Q("La virgule sépare :", ["la partie entière et la partie décimale", "les milliers et les centaines", "le numérateur et le dénominateur"], 0, "C'est son rôle."),
+      Q("Vrai ou faux : 1,28 = 128/100.", VF, 0, "1,28 = 128 centièmes.")
+    ])
+  ], true);
+
+var LECON_NUM15 = LN("num15", "Num 15 · Lire, écrire, décomposer, placer et encadrer, comparer et ranger les nombres décimaux",
+  "Un nombre décimal est composé d'une partie entière et d'une partie décimale. La virgule sépare les deux parties. Pour connaître la valeur des chiffres, on utilise un tableau de numération : partie entière (centaines, dizaines, unités) puis partie décimale (dixièmes, centièmes).\n\nLe nombre 56,78 se lit « 56 virgule 78 » ou « 56 unités et 78 centièmes ».\n\nUn nombre décimal reste inchangé si on ajoute ou retire des 0 après la partie décimale. Ex : 1,60000 = 1,6 ; 765,070 = 765,07.\n\nOn peut placer les nombres décimaux sur une demi-droite graduée en dixièmes ou en centièmes. On peut intercaler un nombre décimal entre deux autres : 0,6 s'intercale entre 0 et 1, 0,75 entre 0,7 et 0,8.\n\nOn peut encadrer un nombre décimal : au centième près 1,76 < 1,77 < 1,78 ; au dixième près 0,7 < 0,8 < 0,9 ; à l'unité près 0 < 0,5 < 1.\n\nPour comparer des nombres décimaux, on compare d'abord la partie entière. Ex : 14,4 > 12,47 car 14 > 12.\nS'ils ont la même partie entière, on compare la partie décimale chiffre par chiffre : d'abord les dixièmes, puis les centièmes. Ex : 23,67 < 23,87 car 6 dixièmes < 8 dixièmes.\n\nLa partie décimale la plus longue n'est pas forcément la plus grande ! Ex : 12,65 < 12,7. Pour comparer, on peut aussi compléter la partie décimale avec des zéros : 12,65 < 12,70.",
+  [
+    EX("Lire et écrire", [
+      Q("Dans 56,78, le chiffre 7 est :", ["les dixièmes", "les centièmes", "les dizaines"], 0, "Le premier chiffre après la virgule : dixièmes."),
+      Q("Dans 56,78, le chiffre 8 est :", ["les dixièmes", "les centièmes", "les unités"], 1, "Le deuxième chiffre après la virgule : centièmes."),
+      Q("56,78 se lit aussi :", ["56 unités et 78 centièmes", "56 unités et 78 dixièmes", "5 678 unités"], 0, "0,78 = 78 centièmes."),
+      Q("1,60000 =", ["1,6", "16", "1,00006"], 0, "On peut enlever les zéros inutiles."),
+      Q("765,070 =", ["765,07", "76,507", "765,7"], 0, "Le zéro à la fin ne change rien.")
+    ]),
+    EX("Comparer", [
+      Q("14,4 ... 12,47", [">", "<", "="], 0, "On compare d'abord les parties entières : 14 > 12."),
+      Q("23,67 ... 23,87", ["<", ">", "="], 0, "Mêmes parties entières : 6 dixièmes < 8 dixièmes."),
+      Q("12,65 ... 12,7", ["<", ">", "="], 0, "12,7 = 12,70 et 65 centièmes < 70 centièmes."),
+      Q("Quel nombre est le plus grand ?", ["3,45", "3,5", "3,09"], 1, "3,5 = 3,50 : c'est le plus grand."),
+      Q("Vrai ou faux : 12,65 > 12,7 car 12,65 a plus de chiffres.", VF, 1, "La partie décimale la plus longue n'est pas forcément la plus grande.")
+    ]),
+    EX("Encadrer et intercaler", [
+      Q("Quel nombre s'intercale entre 0 et 1 ?", ["0,6", "1,6", "6"], 0, "0 < 0,6 < 1."),
+      Q("Quel nombre est entre 0,7 et 0,8 ?", ["0,75", "0,85", "0,9"], 0, "0,7 < 0,75 < 0,8."),
+      Q("0,8 encadré à l'unité près :", ["0 < 0,8 < 1", "1 < 0,8 < 2", "0,7 < 0,8 < 0,9"], 0, "L'unité d'avant est 0, celle d'après est 1."),
+      Q("0,8 encadré au dixième près :", ["0 < 0,8 < 1", "0,7 < 0,8 < 0,9", "0,79 < 0,8 < 0,81"], 1, "Les dixièmes juste avant et après."),
+      Q("Vrai ou faux : 0,75 se place entre 0,7 et 0,8.", VF, 0, "0,7 < 0,75 < 0,8.")
+    ])
+  ], true);
+
+var LECON_NUM16 = LN("num16", "Num 16 · Calculer une fraction d'une quantité",
+  "Pour calculer une fraction d'une quantité, je partage d'abord la quantité en parts égales, puis je prends le nombre de parts demandé.\n\nExemple : calculer 3/4 de 12.\n1. Je partage 12 en 4 parts égales : 12 : 4 = 3.\n2. Je prends 3 parts : 3 × 3 = 9.\nDonc 3/4 de 12 = 9.\n\nCette procédure s'utilise aussi avec des grandeurs : 1/4 de 20 euros, 2/3 de 15 cm...",
+  [
+    EX("Calculer une fraction d'une quantité", [
+      Q("3/4 de 12 =", ["3", "9", "16"], 1, "12 : 4 = 3, puis 3 × 3 = 9."),
+      Q("1/4 de 20 euros =", ["5 euros", "10 euros", "80 euros"], 0, "20 : 4 = 5."),
+      Q("2/3 de 15 cm =", ["5 cm", "10 cm", "30 cm"], 1, "15 : 3 = 5, puis 2 × 5 = 10."),
+      Q("1/5 de 30 =", ["5", "6", "150"], 1, "30 : 5 = 6."),
+      Q("3/5 de 20 =", ["4", "12", "15"], 1, "20 : 5 = 4, puis 3 × 4 = 12."),
+      Q("2/4 de 16 =", ["4", "8", "12"], 1, "16 : 4 = 4, puis 2 × 4 = 8.")
+    ]),
+    EX("La méthode", [
+      Q("Pour calculer 3/4 de 12, on partage d'abord 12 en :", ["3 parts égales", "4 parts égales", "12 parts égales"], 1, "Le dénominateur dit en combien de parts on partage."),
+      Q("Ensuite on prend :", ["4 parts", "3 parts", "12 parts"], 1, "Le numérateur dit combien de parts on prend."),
+      Q("3/4 de 12, c'est la même chose que :", ["12 : 4 × 3", "12 + 3 + 4", "12 × 4 : 3"], 0, "Diviser par le dénominateur, multiplier par le numérateur."),
+      Q("1/3 de 18 =", ["3", "6", "54"], 1, "18 : 3 = 6."),
+      Q("Vrai ou faux : 3/4 de 12 = 9.", VF, 0, "12 : 4 = 3 et 3 × 3 = 9.")
+    ])
+  ], true);
+
+var LECON_NUM17 = LN("num17", "Num 17 · Additionner et soustraire des fractions",
+  "Quand les fractions ont le même dénominateur, les parts ont la même taille. J'additionne ou je soustrais seulement les numérateurs.\n\nAddition : 2/7 + 3/7 = 5/7\nSoustraction : 6/8 - 2/8 = 4/8\n\nJe conserve le dénominateur : il indique toujours le nombre de parts égales qui forment l'unité.",
+  [
+    EX("Additionner", [
+      Q("2/7 + 3/7 =", ["5/7", "5/14", "6/7"], 0, "2 + 3 = 5 ; le dénominateur reste 7."),
+      Q("1/5 + 3/5 =", ["4/5", "4/10", "3/5"], 0, "1 + 3 = 4 ; on garde 5."),
+      Q("3/10 + 4/10 =", ["7/20", "7/10", "12/10"], 1, "3 + 4 = 7 ; on garde 10."),
+      Q("2/9 + 5/9 =", ["7/9", "7/18", "10/9"], 0, "2 + 5 = 7 ; on garde 9."),
+      Q("1/4 + 1/4 =", ["2/4", "2/8", "1/2 de 4"], 0, "1 + 1 = 2 ; on garde 4.")
+    ]),
+    EX("Soustraire", [
+      Q("6/8 - 2/8 =", ["4/8", "4/0", "8/8"], 0, "6 - 2 = 4 ; on garde 8."),
+      Q("5/6 - 1/6 =", ["4/6", "4/0", "6/6"], 0, "5 - 1 = 4 ; on garde 6."),
+      Q("9/10 - 3/10 =", ["6/10", "6/0", "12/10"], 0, "9 - 3 = 6 ; on garde 10."),
+      Q("4/4 - 1/4 =", ["3/4", "5/4", "3/0"], 0, "4 - 1 = 3 ; on garde 4."),
+      Q("Quand on additionne des fractions de même dénominateur, le dénominateur :", ["s'additionne aussi", "reste le même", "disparaît"], 1, "Il indique la taille des parts, elle ne change pas."),
+      Q("Vrai ou faux : 2/7 + 3/7 = 5/14.", VF, 1, "Le dénominateur ne s'additionne pas : 2/7 + 3/7 = 5/7.")
+    ])
+  ], true);
+
+
+/* ---------- Leçons de maths : Calc 1 à 13, tables, Esp & géom 1 à 15 (hors quiz) ---------- */
+var LECON_CALC1 = LN("calc1", "Calc 1 · Additionner des entiers",
+  "L'addition est une opération qui permet de calculer la somme de plusieurs nombres.\n\nOn peut changer l'ordre de ses termes sans que cela modifie le résultat.\nEx : 12 + 4 520 + 596 = 5 128\n\nOn évalue toujours l'ordre de grandeur du résultat avant de calculer.\nEx : 4 520 + 596 + 12, c'est proche de 4 500 + 600 + 10 = 5 110\n\nLorsque tu connais la somme de deux nombres comme 8 + 5 = 13, tu peux en déduire :\n- une autre somme : 5 + 8 = 13\n- deux compléments : de 8 à 13, il y a 5 ; de 5 à 13, il y a 8\n- deux différences : 13 - 8 = 5 et 13 - 5 = 8\n\nQuand on pose une addition, on aligne les chiffres des unités, ceux des dizaines... Rappel : il ne faut pas oublier les retenues.",
+  [
+    EX("Additionner", [
+      Q("12 + 4 520 + 596 =", ["5 128", "5 018", "5 218"], 0, "4 520 + 596 = 5 116, puis + 12 = 5 128."),
+      Q("On peut changer l'ordre des termes d'une addition :", ["Oui, le résultat ne change pas", "Non, le résultat change", "Seulement avec 2 nombres"], 0, "12 + 596 + 4 520 donne aussi 5 128."),
+      Q("4 520 + 596 + 12, c'est proche de :", ["4 500 + 600 + 10", "4 000 + 500 + 100", "5 000 + 1 000 + 100"], 0, "On arrondit chaque nombre : 4 500 + 600 + 10 = 5 110."),
+      Q("Quand on pose une addition, on aligne :", ["les chiffres des unités, des dizaines...", "les premiers chiffres à gauche", "les nombres au hasard"], 0, "Unités sous unités, dizaines sous dizaines."),
+      Q("Vrai ou faux : dans une addition posée, il ne faut pas oublier les retenues.", VF, 0, "Les retenues font partie du calcul.")
+    ]),
+    EX("Sommes, compléments, différences", [
+      Q("8 + 5 = 13. Donc 5 + 8 =", ["13", "3", "40"], 0, "On peut changer l'ordre."),
+      Q("De 8 à 13, il y a :", ["5", "8", "13"], 0, "13 - 8 = 5."),
+      Q("De 5 à 13, il y a :", ["5", "8", "18"], 1, "13 - 5 = 8."),
+      Q("8 + 5 = 13. Donc 13 - 8 =", ["5", "21", "13"], 0, "Une somme donne deux différences."),
+      Q("7 + 6 = 13. Donc 13 - 7 =", ["6", "7", "20"], 0, "13 - 7 = 6.")
+    ])
+  ], true);
+
+var LECON_CALC2 = LN("calc2", "Calc 2 · Soustraire des entiers",
+  "La soustraction est une opération qui permet de calculer un écart ou une différence entre deux nombres. On évalue toujours l'ordre de grandeur du résultat avant de calculer.\nEx : 710 - 587, c'est proche de 700 - 600 = 100.\n\nPour effectuer une soustraction, on peut calculer à l'aide d'un schéma : de 587 à 600 il y a 13, de 600 à 700 il y a 100, de 700 à 710 il y a 10. 587 + 123 = 710 donc 710 - 587 = 123.\n\nOn peut simplifier la soustraction avec la conservation des écarts : quand on ajoute (ou qu'on soustrait) un même nombre aux deux termes d'une différence donnée, on obtient une différence égale.\n115 - 77 est égale à 138 - 100 (on a ajouté 23) = 38.\n146 - 100 est égale à 109 - 63 (on a retiré 37) = 46.\n\nOn peut poser la soustraction. Attention : on pose toujours le plus grand nombre en premier. Si on ajoute une dizaine au nombre du haut, on doit en ajouter une au nombre du bas. Puis on soustrait les unités ensemble et ensuite les dizaines.\n\nOpération de vérification : pour être sûr de ne pas s'être trompé, tu peux additionner. 57 + 25 = 82, donc 82 - 25 = 57.",
+  [
+    EX("Soustraire", [
+      Q("710 - 587, c'est proche de :", ["700 - 600 = 100", "700 - 500 = 200", "800 - 500 = 300"], 0, "On arrondit : 700 - 600."),
+      Q("710 - 587 =", ["123", "133", "223"], 0, "587 + 123 = 710."),
+      Q("115 - 77 = 138 - 100 =", ["38", "48", "28"], 0, "On a ajouté 23 aux deux nombres : l'écart est le même."),
+      Q("146 - 100 = 46. Donc 109 - 63 =", ["46", "36", "56"], 0, "On a retiré 37 aux deux nombres : l'écart reste 46."),
+      Q("Dans une soustraction posée, on place en haut :", ["le plus grand nombre", "le plus petit nombre", "n'importe lequel"], 0, "On pose toujours le plus grand en premier.")
+    ]),
+    EX("Vérifier et simplifier", [
+      Q("Pour vérifier 82 - 25 = 57, on calcule :", ["57 + 25", "82 + 25", "57 - 25"], 0, "57 + 25 = 82."),
+      Q("57 + 25 = 82. Donc 82 - 57 =", ["25", "35", "139"], 0, "Une somme donne deux différences."),
+      Q("Pour calculer 502 - 298, on peut calculer :", ["504 - 300", "500 - 300", "502 - 300"], 0, "On ajoute 2 aux deux nombres : l'écart reste le même. 504 - 300 = 204."),
+      Q("Vrai ou faux : si on ajoute 10 aux deux termes d'une soustraction, le résultat ne change pas.", VF, 0, "C'est la conservation des écarts."),
+      Q("Vrai ou faux : si on ajoute 10 au nombre du haut seulement, le résultat ne change pas.", VF, 1, "Il faut ajouter 10 aux deux nombres.")
+    ])
+  ], true);
+
+var LECON_CALC3 = LN("calc3", "Calc 3 · Multiplier et diviser par 10, 100, 1 000",
+  "Lorsqu'on multiplie un nombre par 10, 100, 1 000..., chacun de ses chiffres prend une valeur 10 fois, 100 fois, 1 000 fois... plus grande.\nEx : 207 × 10 = 2 070.\n\nLorsqu'on divise un nombre par 10, chacun de ses chiffres prend une valeur 10 fois plus petite.\nEx : 4 500 : 10 = 450.",
+  [
+    EX("Multiplier", [
+      Q("207 × 10 =", ["2 070", "20 700", "217"], 0, "Chaque chiffre devient 10 fois plus grand."),
+      Q("45 × 100 =", ["450", "4 500", "45 000"], 1, "× 100 : deux zéros."),
+      Q("3 × 1 000 =", ["300", "3 000", "30 000"], 1, "× 1 000 : trois zéros."),
+      Q("12 × 10 =", ["120", "1 200", "22"], 0, "× 10 : un zéro."),
+      Q("Quand on multiplie par 100, chaque chiffre prend une valeur :", ["100 fois plus grande", "100 fois plus petite", "10 fois plus grande"], 0, "× 100 : valeurs 100 fois plus grandes.")
+    ]),
+    EX("Diviser", [
+      Q("4 500 : 10 =", ["450", "45", "4 510"], 0, "Chaque chiffre devient 10 fois plus petit."),
+      Q("7 000 : 100 =", ["70", "700", "7"], 0, "7 000 : 100 = 70."),
+      Q("530 : 10 =", ["53", "5,3", "5 300"], 0, "530 : 10 = 53."),
+      Q("2 000 : 1 000 =", ["2", "20", "200"], 0, "2 000 : 1 000 = 2."),
+      Q("Vrai ou faux : quand on divise par 10, chaque chiffre prend une valeur 10 fois plus petite.", VF, 0, "C'est la règle de la division par 10.")
+    ])
+  ], true);
+
+var LECON_TABLES = LN("tables", "Les tables de multiplication et la table de Pythagore",
+  "La table de Pythagore permet de retrouver tous les produits de la table de 1 à la table de 10 : on lit le résultat à la croisée de la ligne et de la colonne.\n\nQuelques produits à connaître :\n6 × 6 = 36, 6 × 7 = 42, 6 × 8 = 48, 6 × 9 = 54\n7 × 7 = 49, 7 × 8 = 56, 7 × 9 = 63\n8 × 8 = 64, 8 × 9 = 72\n9 × 9 = 81, 10 × 10 = 100\n\nOn peut changer l'ordre des facteurs : 7 × 8 = 8 × 7.",
+  [
+    EX("Les tables de 6 à 10", [
+      Q("6 × 7 =", ["42", "36", "48"], 0, "6 × 7 = 42."),
+      Q("8 × 7 =", ["54", "56", "64"], 1, "8 × 7 = 56."),
+      Q("9 × 6 =", ["54", "63", "56"], 0, "9 × 6 = 54."),
+      Q("7 × 7 =", ["49", "42", "56"], 0, "7 × 7 = 49."),
+      Q("8 × 8 =", ["64", "72", "56"], 0, "8 × 8 = 64."),
+      Q("9 × 9 =", ["72", "81", "90"], 1, "9 × 9 = 81.")
+    ]),
+    EX("Les tables de 1 à 5 et les retournements", [
+      Q("4 × 8 =", ["32", "36", "28"], 0, "4 × 8 = 32."),
+      Q("3 × 9 =", ["27", "24", "36"], 0, "3 × 9 = 27."),
+      Q("5 × 7 =", ["30", "35", "40"], 1, "5 × 7 = 35."),
+      Q("7 × 8 = 56. Donc 8 × 7 =", ["56", "48", "15"], 0, "On peut changer l'ordre des facteurs."),
+      Q("10 × 10 =", ["100", "1 000", "20"], 0, "10 × 10 = 100."),
+      Q("Vrai ou faux : 6 × 8 = 48.", VF, 0, "6 × 8 = 48.")
+    ])
+  ,
+    EX("Toutes les tables de 2 à 10", (function () {
+      var qs = [];
+      for (var a = 2; a <= 10; a++) {
+        for (var c = a; c <= 10; c++) {
+          var r = a * c, d1 = r + a, d2 = c > 2 ? r - c : r + c + 1;
+          if (d2 === d1 || d2 === r || d2 < 0) { d2 = r + 10; }
+          qs.push(Q(a + " × " + c + " =", [String(r), String(d1), String(d2)], 0, a + " × " + c + " = " + r + "."));
+        }
+      }
+      return qs;
+    })())
+  ], false);
+
+var LECON_CALC4 = LN("calc4", "Calc 4 · Multiplier par un nombre à un chiffre",
+  "La multiplication est une opération qui simplifie le calcul de l'addition d'un même nombre. Son résultat s'appelle le produit.\nEx : 15 + 15 + 15 + 15 + 15 = 5 × 15 = 75\n5 et 15 sont les facteurs du produit. 75 est le produit des nombres 5 et 15.\n\nLorsque tu connais le produit de 2 nombres comme 8 × 5 = 40, tu peux en déduire que :\n8 × 5 = 40 et 5 × 8 = 40 ; dans 40 il y a 5 fois 8 et 8 fois 5 ; 40 : 5 = 8 et 40 : 8 = 5.\n\nPour multiplier deux nombres on peut :\n- décomposer la multiplication en ligne. Ex : 412 × 8 = (400 × 8) + (10 × 8) + (2 × 8) = 3 200 + 80 + 16 = 3 296\n- poser la multiplication : on commence par multiplier les unités, puis les dizaines, puis les centaines...\n\nEx : 1 209 × 7 = 8 463 (7 × 9 = 63, je pose 3 et je retiens 6 ; 7 × 0 = 0, plus la retenue 6 égale 6 ; 7 × 2 = 14, je pose 4 et je retiens 1 ; 7 × 1 = 7, plus la retenue 1 égale 8).",
+  [
+    EX("Vocabulaire et décomposition", [
+      Q("Le résultat d'une multiplication s'appelle :", ["le produit", "la somme", "la différence"], 0, "Le produit."),
+      Q("15 + 15 + 15 + 15 + 15 =", ["5 × 15", "15 × 15", "5 + 15"], 0, "5 fois 15."),
+      Q("8 × 5 = 40. Donc 40 : 8 =", ["5", "8", "32"], 0, "Dans 40 il y a 5 fois 8."),
+      Q("412 × 8 = (400 × 8) + (10 × 8) + (2 × 8) =", ["3 296", "3 216", "3 396"], 0, "3 200 + 80 + 16 = 3 296."),
+      Q("Vrai ou faux : 5 et 15 sont les facteurs de 5 × 15.", VF, 0, "Les nombres que l'on multiplie sont les facteurs.")
+    ]),
+    EX("Poser la multiplication", [
+      Q("1 209 × 7 =", ["8 463", "8 363", "7 463"], 0, "7 × 9 = 63, puis les autres chiffres avec les retenues."),
+      Q("7 × 9 = 63. Je pose :", ["3 et je retiens 6", "6 et je retiens 3", "63 sans retenue"], 0, "On pose le chiffre des unités et on retient les dizaines."),
+      Q("Quand on pose une multiplication, on commence par multiplier :", ["les unités", "les centaines", "les milliers"], 0, "Unités, puis dizaines, puis centaines..."),
+      Q("3 × 124 =", ["372", "362", "312"], 0, "3 × 100 + 3 × 20 + 3 × 4 = 372."),
+      Q("2 × 1 500 =", ["3 000", "2 500", "300"], 0, "2 × 1 500 = 3 000.")
+    ])
+  ], true);
+
+var LECON_CALC5 = LN("calc5", "Calc 5 · Multiplier par un nombre à plusieurs chiffres",
+  "Pour effectuer une multiplication à plusieurs chiffres, on décompose son multiplicateur.\nEx : 753 × 65 = (753 × 60) + (753 × 5)\n\nQuand on pose l'opération, on multiplie avec les unités, puis avec les dizaines, puis avec les centaines...\n1) On multiplie 753 par 5 unités : 3 765.\n2) On place un zéro car on multiplie par 6 dizaines : 753 × 60 = 45 180.\n3) On additionne : 3 765 + 45 180 = 48 945. Donc 753 × 65 = 48 945.\n\nPour multiplier rapidement avec des nombres à deux chiffres, on peut apprendre d'autres tables : celle de 11, celle de 15...\n\nAutre exemple : 343 × 56 : 343 × 6 = 2 058 ; 343 × 50 = 17 150 ; 2 058 + 17 150 = 19 208.",
+  [
+    EX("Multiplier par 2 chiffres", [
+      Q("753 × 65 = (753 × 60) + ...", ["(753 × 5)", "(753 × 6)", "(753 × 65)"], 0, "65 = 60 + 5."),
+      Q("753 × 5 =", ["3 765", "3 565", "3 755"], 0, "753 × 5 = 3 765."),
+      Q("753 × 60 =", ["45 180", "4 518", "451 800"], 0, "753 × 6 = 4 518, puis on place un zéro."),
+      Q("753 × 65 =", ["48 945", "48 845", "49 945"], 0, "3 765 + 45 180 = 48 945."),
+      Q("Quand on multiplie par les dizaines, on place d'abord :", ["un zéro", "une virgule", "un 1"], 0, "On place un zéro car on multiplie par des dizaines.")
+    ]),
+    EX("Autres calculs", [
+      Q("343 × 6 =", ["2 058", "2 048", "1 958"], 0, "343 × 6 = 2 058."),
+      Q("343 × 50 =", ["17 150", "1 715", "171 500"], 0, "343 × 5 = 1 715, puis un zéro."),
+      Q("343 × 56 =", ["19 208", "19 108", "18 208"], 0, "2 058 + 17 150 = 19 208."),
+      Q("12 × 15 =", ["180", "170", "150"], 0, "12 × 10 + 12 × 5 = 120 + 60 = 180."),
+      Q("Vrai ou faux : 25 × 12 = 300.", VF, 0, "25 × 12 = 250 + 50 = 300.")
+    ])
+  ], true);
+
+var LECON_CALC6 = LN("calc6", "Calc 6 · Connaître les multiples et diviseurs d'un nombre",
+  "50 est un multiple de 5, car il est dans la table de 5 : 5 × 10 = 50.\n50 est un multiple de 10, car il est dans la table de 10.\n500 est aussi un multiple de 5 car 5 × 100 = 500.\n5 et 10 sont donc des diviseurs de 50.\n\nÀ savoir :\n- Les multiples de 2 sont tous des nombres pairs.\n- Les multiples de 3 s'appellent les triples. Ils sont divisibles par 3.\n- Les multiples de 5 se terminent toujours par 0 ou 5.\n- Les multiples de 10 se terminent toujours par 0.",
+  [
+    EX("Multiples", [
+      Q("Quel nombre est un multiple de 5 ?", ["35", "42", "28"], 0, "Il se termine par 5."),
+      Q("Quel nombre est un multiple de 10 ?", ["70", "75", "17"], 0, "Il se termine par 0."),
+      Q("Les multiples de 2 sont :", ["les nombres pairs", "les nombres impairs", "les nombres qui finissent par 5"], 0, "2, 4, 6, 8, 10..."),
+      Q("Quel nombre est un multiple de 3 ?", ["12", "14", "20"], 0, "12 = 3 × 4."),
+      Q("500 est un multiple de 5 car :", ["5 × 100 = 500", "5 + 100 = 105", "500 : 2 = 250"], 0, "500 est dans la table de 5.")
+    ]),
+    EX("Diviseurs", [
+      Q("5 et 10 sont des diviseurs de :", ["50", "52", "57"], 0, "50 : 5 = 10 et 50 : 10 = 5."),
+      Q("7 est un diviseur de :", ["21", "22", "25"], 0, "21 = 7 × 3."),
+      Q("Les multiples de 5 se terminent toujours par :", ["0 ou 5", "5 ou 6", "0 ou 1"], 0, "5, 10, 15, 20..."),
+      Q("Vrai ou faux : 48 est un multiple de 2.", VF, 0, "48 est pair."),
+      Q("Vrai ou faux : 33 est un multiple de 10.", VF, 1, "Un multiple de 10 se termine par 0.")
+    ])
+  ], true);
+
+var LECON_CALC7 = LN("calc7", "Calc 7 · Approcher la division",
+  "La division permet de grouper en parts égales. Ex : Marco veut ranger 35 biscuits dans des boîtes de 5.\nLa division permet de partager en parts égales. Ex : on peut partager 35 biscuits entre 5 enfants.\n\n35 = 5 × 7 donc 35 : 5 = 7.\n35 est le dividende (le nombre qui est divisé), 5 est le diviseur (le nombre qui divise), 7 est le quotient (le résultat).\n\nOn trouve un reste quand le dividende n'est pas un multiple du diviseur : on cherche alors le multiple le plus proche.\nEx : 38 divisé par 5. 38 est compris entre 5 × 7 et 5 × 8 : 5 × 7 < 38 < 5 × 8. 38 divisé par 5 égale 7. Il reste 3 car 38 = (7 × 5) + 3.\n\nAttention : le reste est toujours plus petit que le diviseur.",
+  [
+    EX("Vocabulaire", [
+      Q("Dans 35 : 5 = 7, le dividende est :", ["35", "5", "7"], 0, "Le dividende est le nombre qui est divisé."),
+      Q("Dans 35 : 5 = 7, le diviseur est :", ["35", "5", "7"], 1, "Le diviseur est le nombre qui divise."),
+      Q("Dans 35 : 5 = 7, le quotient est :", ["35", "5", "7"], 2, "Le quotient est le résultat."),
+      Q("Marco range 35 biscuits dans des boîtes de 5. Il utilise :", ["7 boîtes", "5 boîtes", "30 boîtes"], 0, "35 : 5 = 7."),
+      Q("Le reste est toujours :", ["plus petit que le diviseur", "plus grand que le diviseur", "égal au quotient"], 0, "Sinon on pourrait encore partager.")
+    ]),
+    EX("Quotient et reste", [
+      Q("38 divisé par 5 : le quotient est :", ["7", "8", "6"], 0, "5 × 7 = 35 < 38 < 40 = 5 × 8."),
+      Q("38 divisé par 5 : le reste est :", ["3", "5", "2"], 0, "38 - 35 = 3."),
+      Q("47 divisé par 6 : quotient et reste :", ["7 et reste 5", "8 et reste 1", "7 et reste 6"], 0, "6 × 7 = 42 et 47 - 42 = 5."),
+      Q("29 divisé par 4 : quotient et reste :", ["7 et reste 1", "6 et reste 5", "7 et reste 4"], 0, "4 × 7 = 28 et 29 - 28 = 1."),
+      Q("Vrai ou faux : dans une division par 5, le reste peut être 6.", VF, 1, "Le reste est plus petit que 5.")
+    ])
+  ], true);
+
+var LECON_CALC8 = LN("calc8", "Calc 8 · Diviser un entier par un nombre à un chiffre",
+  "Le quotient et le reste sont le résultat d'une division.\nEXEMPLE : on cherche à diviser 597 par 8.\n- Avant de poser la division, on évalue le nombre de chiffres du quotient : 8 × 10 < 597 < 8 × 100. Le quotient sera compris entre 10 et 100 : il aura donc deux chiffres.\n- La division de 5 centaines par 8 ne permet pas d'obtenir des centaines. Je dois donc commencer par diviser les 59 dizaines du dividende par 8. 59 divisé par 8 : on cherche le multiple de 8 le plus proche de 59. 8 × 7 = 56. Cela fait 7 dizaines au quotient. 59 - 56 = 3. Il reste 3 dizaines.\n- Pour trouver le nombre d'unités, on abaisse les 7 unités. Avec les 3 dizaines, cela fait 37 unités. 37 divisé par 8 : 8 × 4 = 32. Cela fait 4 unités au quotient. 37 - 32 = 5. Il reste 5 unités.\nATTENTION : le reste doit toujours être inférieur au diviseur.\nDans la division de 597 par 8, le quotient est 74 et le reste est 5.\nPour vérifier : (quotient × diviseur) + reste = dividende. Ex : (74 × 8) + 5 = 592 + 5 = 597.\n\nMéthode 2 pour trouver le nombre de chiffres du quotient :\nExemple 1 : 528 divisé par 4. Je peux diviser le chiffre des centaines (5) par 4, donc mon quotient aura forcément un chiffre des centaines, un des dizaines et un des unités. Il y aura donc trois chiffres au quotient.\nExemple 2 : 835 divisé par 13. Je ne peux pas diviser le chiffre des centaines (8) par 13 : donc mon quotient aura 0 centaine. Je partage alors les 83 dizaines en 13. Il y aura forcément un chiffre des dizaines et un des unités. Il y aura donc deux chiffres au quotient.",
+  [
+    EX("Diviser 597 par 8", [
+      Q("597 divisé par 8 : le quotient aura :", ["deux chiffres", "un chiffre", "trois chiffres"], 0, "8 × 10 < 597 < 8 × 100."),
+      Q("On divise d'abord les :", ["59 dizaines", "5 centaines", "597 unités"], 0, "5 centaines ne se partagent pas en 8."),
+      Q("8 × 7 =", ["56", "54", "64"], 0, "8 × 7 = 56."),
+      Q("597 divisé par 8 : quotient et reste :", ["74 et reste 5", "75 et reste 4", "74 et reste 8"], 0, "74 × 8 = 592 et 597 - 592 = 5."),
+      Q("Pour vérifier une division, on calcule :", ["(quotient × diviseur) + reste", "quotient + diviseur + reste", "dividende × diviseur"], 0, "On doit retrouver le dividende.")
+    ]),
+    EX("Nombre de chiffres du quotient", [
+      Q("528 divisé par 4 : le quotient a :", ["trois chiffres", "deux chiffres", "un chiffre"], 0, "5 centaines peuvent être divisées par 4."),
+      Q("835 divisé par 13 : le quotient a :", ["deux chiffres", "trois chiffres", "un chiffre"], 0, "8 centaines ne se divisent pas par 13 : on divise 83 dizaines."),
+      Q("Le reste doit être :", ["inférieur au diviseur", "supérieur au diviseur", "égal au dividende"], 0, "Toujours plus petit que le diviseur."),
+      Q("(74 × 8) + 5 =", ["597", "592", "602"], 0, "592 + 5 = 597."),
+      Q("Vrai ou faux : 37 divisé par 8 donne 4 et il reste 5.", VF, 0, "8 × 4 = 32 et 37 - 32 = 5.")
+    ])
+  ], true);
+
+var LECON_CALC9 = LN("calc9", "Calc 9 · Diviser un entier par un nombre à deux chiffres",
+  "On cherche à diviser 978 par 23.\nAvant de poser la division, on évalue le nombre de chiffres du quotient : 23 × 10 < 978 < 23 × 100. Le quotient sera compris entre 10 et 100 : il aura donc deux chiffres.\n\nPour trouver le nombre de dizaines du quotient, on divise les dizaines du dividende par 23.\n97 divisé par 23 : on cherche le multiple de 23 le plus proche de 97. 23 × 4 = 92. Cela fait 4 dizaines au quotient. 97 - 92 = 5. Il reste 5 dizaines.\n\nPour trouver le nombre d'unités, on abaisse les 8 unités. Avec les 5 dizaines, cela fait 58 unités. On divise le nombre d'unités par 23.\n58 divisé par 23 : 23 × 2 = 46. Cela fait 2 unités au quotient. 58 - 46 = 12. Il reste 12 unités.\n\nPour faciliter l'opération, je peux écrire la table de multiplication du diviseur.\nPour vérifier : (quotient × diviseur) + reste = dividende. Ex : (42 × 23) + 12 = 966 + 12 = 978.\nDonc 978 divisé par 23 : le quotient est 42 et le reste est 12.",
+  [
+    EX("Diviser 978 par 23", [
+      Q("978 divisé par 23 : le quotient a :", ["deux chiffres", "un chiffre", "trois chiffres"], 0, "23 × 10 < 978 < 23 × 100."),
+      Q("23 × 4 =", ["92", "82", "96"], 0, "23 × 4 = 92."),
+      Q("97 - 92 =", ["5", "15", "7"], 0, "Il reste 5 dizaines."),
+      Q("23 × 2 =", ["46", "36", "56"], 0, "23 × 2 = 46."),
+      Q("58 - 46 =", ["12", "22", "14"], 0, "Il reste 12 unités.")
+    ]),
+    EX("Résultat et vérification", [
+      Q("978 divisé par 23 : quotient et reste :", ["42 et reste 12", "41 et reste 35", "42 et reste 23"], 0, "42 × 23 = 966 et 978 - 966 = 12."),
+      Q("(42 × 23) + 12 =", ["978", "966", "990"], 0, "966 + 12 = 978."),
+      Q("Pour faciliter la division par 23, je peux écrire :", ["la table de multiplication de 23", "la table de 10", "la table de 2"], 0, "23, 46, 69, 92..."),
+      Q("Pour trouver les dizaines du quotient, on divise :", ["les dizaines du dividende par 23", "les unités par 23", "le diviseur par 10"], 0, "97 dizaines divisées par 23."),
+      Q("Vrai ou faux : le reste 12 est inférieur au diviseur 23.", VF, 0, "12 < 23 : le reste est correct.")
+    ])
+  ], true);
+
+var LECON_CALC10 = LN("calc10", "Calc 10 · Additionner des décimaux",
+  "Pour poser une addition avec des nombres décimaux, on applique les mêmes règles que pour les nombres entiers.\nOn aligne les unités avec les unités, les dizaines avec les dizaines...\nOn aligne les chiffres de la partie décimale : dixièmes avec dixièmes, centièmes avec centièmes...\nOn peut compléter la partie décimale avec des zéros pour qu'il y ait le même nombre de chiffres après la virgule dans chaque nombre.\nLa virgule est aussi alignée et replacée au résultat : c'est l'arbre à virgules.\n\nEx : 46,7 + 4,25 = 46,70 + 4,25 = 50,95.",
+  [
+    EX("Additionner des décimaux", [
+      Q("46,7 + 4,25 =", ["50,95", "51,05", "50,32"], 0, "46,70 + 4,25 = 50,95."),
+      Q("3,5 + 2,25 =", ["5,75", "5,30", "6,75"], 0, "3,50 + 2,25 = 5,75."),
+      Q("0,5 + 0,25 =", ["0,75", "0,30", "0,525"], 0, "0,50 + 0,25 = 0,75."),
+      Q("12,4 + 0,6 =", ["13", "12,10", "13,10"], 0, "12,4 + 0,6 = 13,0 = 13."),
+      Q("1,2 + 3,8 =", ["5", "4,10", "5,10"], 0, "1,2 + 3,8 = 5,0 = 5.")
+    ]),
+    EX("Poser l'addition", [
+      Q("On aligne :", ["les virgules, unités sous unités", "les derniers chiffres à droite", "les premiers chiffres à gauche"], 0, "L'arbre à virgules : virgule sous virgule."),
+      Q("46,7 peut aussi s'écrire :", ["46,70", "46,07", "467,0"], 0, "On peut ajouter des zéros après la partie décimale."),
+      Q("Dans une addition posée, la virgule du résultat est :", ["alignée avec celles des nombres", "au hasard", "tout à gauche"], 0, "Elle est replacée dans le résultat."),
+      Q("Vrai ou faux : on peut compléter la partie décimale avec des zéros.", VF, 0, "Cela ne change pas la valeur du nombre."),
+      Q("Vrai ou faux : 2,5 + 1,5 = 3,10.", VF, 1, "2,5 + 1,5 = 4.")
+    ])
+  ], true);
+
+var LECON_CALC11 = LN("calc11", "Calc 11 · Soustraire des décimaux",
+  "Pour poser une soustraction avec des nombres décimaux, on applique les mêmes règles que pour les nombres entiers.\nOn aligne les unités avec les unités, les dizaines avec les dizaines...\nOn aligne les chiffres de la partie décimale : dixièmes avec dixièmes, centièmes avec centièmes...\nOn complète la partie décimale avec des zéros pour qu'il y ait le même nombre de chiffres après la virgule dans chaque nombre.\nLa virgule est aussi alignée et replacée au résultat : c'est l'arbre à virgules.\n\nEx : 57,6 - 24,25 = 57,60 - 24,25 = 33,35.",
+  [
+    EX("Soustraire des décimaux", [
+      Q("57,6 - 24,25 =", ["33,35", "33,45", "32,35"], 0, "57,60 - 24,25 = 33,35."),
+      Q("8,5 - 3,25 =", ["5,25", "5,35", "4,25"], 0, "8,50 - 3,25 = 5,25."),
+      Q("10 - 2,5 =", ["7,5", "8,5", "7,05"], 0, "10,0 - 2,5 = 7,5."),
+      Q("6,4 - 0,9 =", ["5,5", "6,5", "5,05"], 0, "6,4 - 0,9 = 5,5."),
+      Q("9,5 - 4,75 =", ["4,75", "5,25", "4,25"], 0, "9,50 - 4,75 = 4,75.")
+    ]),
+    EX("Poser la soustraction", [
+      Q("57,6 peut aussi s'écrire :", ["57,60", "57,06", "576,0"], 0, "On complète avec un zéro."),
+      Q("Pour poser une soustraction de décimaux, on aligne :", ["les virgules", "les chiffres à gauche", "les nombres au hasard"], 0, "Virgule sous virgule."),
+      Q("Dans une soustraction, on place en haut :", ["le plus grand nombre", "le plus petit nombre", "n'importe lequel"], 0, "On pose toujours le plus grand en premier."),
+      Q("Vrai ou faux : 5 - 1,5 = 3,5.", VF, 0, "5,0 - 1,5 = 3,5."),
+      Q("Vrai ou faux : on complète la partie décimale avec des zéros pour calculer plus facilement.", VF, 0, "C'est la règle de l'arbre à virgules.")
+    ])
+  ], true);
+
+var LECON_CALC12 = LN("calc12", "Calc 12 · Multiplier des nombres décimaux",
+  "Pour multiplier un nombre entier par un nombre décimal ou pour multiplier deux nombres décimaux :\n- on commence par effectuer la multiplication comme avec les nombres entiers sans prendre en compte la virgule ;\n- on ajoute la virgule au résultat pour qu'il y ait le même nombre de chiffres après la virgule que dans le(s) nombre(s) décimal(aux) multiplié(s).\n\nEx : 12,8 × 3,2. On calcule 128 × 32 = 4 096. Il y a 2 chiffres après la virgule (un dans 12,8 et un dans 3,2). Donc 12,8 × 3,2 = 40,96.",
+  [
+    EX("Multiplier des décimaux", [
+      Q("12,8 × 3,2 =", ["40,96", "409,6", "4,096"], 0, "128 × 32 = 4 096, avec 2 chiffres après la virgule."),
+      Q("128 × 32 =", ["4 096", "4 196", "3 996"], 0, "128 × 30 + 128 × 2 = 3 840 + 256 = 4 096."),
+      Q("1,5 × 2 =", ["3", "30", "0,3"], 0, "15 × 2 = 30, un chiffre après la virgule : 3,0 = 3."),
+      Q("3,2 × 1,5 =", ["4,8", "48", "0,48"], 0, "32 × 15 = 480, 2 chiffres après la virgule : 4,80 = 4,8."),
+      Q("0,3 × 0,3 =", ["0,09", "0,9", "0,6"], 0, "3 × 3 = 9, 2 chiffres après la virgule : 0,09.")
+    ]),
+    EX("La méthode", [
+      Q("On commence par multiplier :", ["sans tenir compte de la virgule", "en ajoutant la virgule", "en divisant par 10"], 0, "Comme avec les nombres entiers."),
+      Q("On place la virgule dans le résultat :", ["pour avoir le même nombre de chiffres après la virgule que dans les deux nombres", "tout à droite", "au hasard"], 0, "On compte les chiffres après la virgule dans les nombres multipliés."),
+      Q("2,5 × 4 =", ["10", "1,0", "100"], 0, "25 × 4 = 100, un chiffre après la virgule : 10,0 = 10."),
+      Q("Vrai ou faux : 0,5 × 0,5 = 0,25.", VF, 0, "5 × 5 = 25, 2 chiffres après la virgule : 0,25."),
+      Q("Vrai ou faux : 1,2 × 3 = 36.", VF, 1, "12 × 3 = 36 avec un chiffre après la virgule : 3,6.")
+    ])
+  ], true);
+
+var LECON_CALC13 = LN("calc13", "Calc 13 · Utiliser des parenthèses",
+  "Les parenthèses indiquent le calcul à effectuer en premier.\n\nEx : 18 + (7 × 4) = 18 + 28 = 46\n\nÉtapes :\n1. Je calcule ce qui est entre parenthèses.\n2. Je remplace les parenthèses par le résultat.\n3. Je termine le calcul.\n\nJe peux estimer le résultat pour vérifier qu'il est vraisemblable.",
+  [
+    EX("Parenthèses", [
+      Q("18 + (7 × 4) =", ["46", "100", "36"], 0, "7 × 4 = 28 puis 18 + 28 = 46."),
+      Q("(5 + 3) × 2 =", ["16", "11", "13"], 0, "5 + 3 = 8 puis 8 × 2 = 16."),
+      Q("20 - (6 + 4) =", ["10", "18", "30"], 0, "6 + 4 = 10 puis 20 - 10 = 10."),
+      Q("3 × (4 + 2) =", ["18", "14", "12"], 0, "4 + 2 = 6 puis 3 × 6 = 18."),
+      Q("10 + (2 × 5) =", ["20", "60", "17"], 0, "2 × 5 = 10 puis 10 + 10 = 20.")
+    ]),
+    EX("Les étapes", [
+      Q("Les parenthèses indiquent :", ["le calcul à effectuer en premier", "le calcul à effectuer en dernier", "qu'il faut s'arrêter"], 0, "On calcule d'abord ce qui est entre parenthèses."),
+      Q("Première étape :", ["je calcule ce qui est entre parenthèses", "je termine le calcul", "j'efface les parenthèses"], 0, "C'est l'étape 1."),
+      Q("Deuxième étape :", ["je remplace les parenthèses par le résultat", "je calcule tout dans l'ordre de lecture", "je recommence"], 0, "C'est l'étape 2."),
+      Q("Vrai ou faux : je peux estimer le résultat pour vérifier qu'il est vraisemblable.", VF, 0, "C'est un bon réflexe."),
+      Q("Vrai ou faux : 18 + (7 × 4) = 46.", VF, 0, "18 + 28 = 46.")
+    ])
+  ], true);
+
+var LECON_CALC13B = LN("calc13b", "Calc 13 · Comprendre l'ordre des calculs",
+  "Des parenthèses placées différemment peuvent changer le résultat.\n\n20 - (6 + 4) : 20 - 10 = 10\n(20 - 6) + 4 : 14 + 4 = 18\n\nAvant de calculer, je repère les parenthèses et je lis toute l'expression.",
+  [
+    EX("Ordre des calculs", [
+      Q("20 - (6 + 4) =", ["10", "18", "30"], 0, "6 + 4 = 10 puis 20 - 10 = 10."),
+      Q("(20 - 6) + 4 =", ["18", "10", "22"], 0, "20 - 6 = 14 puis 14 + 4 = 18."),
+      Q("30 - (10 + 5) =", ["15", "25", "35"], 0, "10 + 5 = 15 puis 30 - 15 = 15."),
+      Q("(30 - 10) + 5 =", ["25", "15", "35"], 0, "30 - 10 = 20 puis 20 + 5 = 25."),
+      Q("20 - (6 + 4) et (20 - 6) + 4 donnent :", ["des résultats différents", "le même résultat", "toujours 20"], 0, "10 et 18 : les parenthèses changent le résultat.")
+    ]),
+    EX("Lire avant de calculer", [
+      Q("Avant de calculer, je :", ["repère les parenthèses et je lis toute l'expression", "calcule tout de suite de gauche à droite", "efface les parenthèses"], 0, "C'est la consigne de la leçon."),
+      Q("Vrai ou faux : des parenthèses placées différemment peuvent changer le résultat.", VF, 0, "Ex : 20 - (6 + 4) = 10 mais (20 - 6) + 4 = 18."),
+      Q("(15 - 5) + 2 =", ["12", "8", "22"], 0, "10 + 2 = 12."),
+      Q("15 - (5 + 2) =", ["8", "12", "18"], 0, "15 - 7 = 8."),
+      Q("Vrai ou faux : 15 - (5 + 2) = (15 - 5) + 2.", VF, 1, "8 n'est pas égal à 12.")
+    ])
+  ], true);
+
+var LECON_ESP1 = LN("esp1", "Esp & géom 1 · Connaître le vocabulaire et le codage géométrique",
+  "En géométrie, il faut être attentif lors de la lecture des consignes et très précis quand on utilise le vocabulaire.\n\n- un point A (noté x A)\n- une droite (d)\n- des points alignés : des points sur une même droite\n- un segment [AB]\n- le milieu I de [AB]\n- un angle Â formé par deux demi-droites\n\nLa figure ABCD a 4 sommets : les points A, B, C, D. Elle a 4 côtés : les segments [AB], [BC], [CD] et [DA].\n\nLa règle sert à mesurer, tracer et vérifier un alignement de points.\nL'équerre sert à vérifier des angles droits et à tracer.\nLe compas sert à tracer des cercles, à comparer des longueurs et à les reporter.\n\nJe peux coder des longueurs égales en dessinant le même code sur le segment. Exemple : AB = CD. AB n'est pas égal à EF.",
+  [
+    EX("Vocabulaire", [
+      Q("[AB] désigne :", ["un segment", "une droite", "un point"], 0, "Les crochets désignent un segment."),
+      Q("(d) désigne :", ["une droite", "un segment", "un angle"], 0, "Une droite se note avec des parenthèses."),
+      Q("Le milieu I de [AB] est :", ["le point à égale distance de A et de B", "le point A", "un point hors de [AB]"], 0, "AI = IB."),
+      Q("Des points alignés sont :", ["sur une même droite", "sur un même cercle", "dans un même carré"], 0, "Ils sont sur la même droite."),
+      Q("Combien de côtés a la figure ABCD ?", ["4", "3", "5"], 0, "[AB], [BC], [CD] et [DA].")
+    ]),
+    EX("Les instruments", [
+      Q("La règle sert à :", ["mesurer et tracer", "tracer des cercles", "vérifier seulement les angles droits"], 0, "Mesurer, tracer, vérifier un alignement."),
+      Q("L'équerre sert à :", ["vérifier et tracer des angles droits", "tracer des cercles", "mesurer des angles quelconques"], 0, "C'est l'instrument des angles droits."),
+      Q("Le compas sert à :", ["tracer des cercles et reporter des longueurs", "mesurer avec des centimètres", "vérifier des angles droits"], 0, "Cercles, comparaison et report de longueurs."),
+      Q("Pour coder des longueurs égales, on utilise :", ["le même code sur chaque segment", "des couleurs différentes", "des lettres différentes"], 0, "Même code = même longueur."),
+      Q("Vrai ou faux : si AB = CD, on met le même code sur [AB] et sur [CD].", VF, 0, "C'est le codage.")
+    ])
+  ], true);
+
+var LECON_ESP2 = LN("esp2", "Esp & géom 2 · Connaître et tracer des cercles",
+  "Un cercle est l'ensemble des points situés à égale distance d'un autre point : le centre du cercle.\n\nLe rayon est la distance entre un point du cercle et le centre. Ex : le rayon [OA].\nLe diamètre est un segment reliant deux points opposés du cercle et passant par le centre. Ex : le diamètre [BC]. Sa longueur est le double de celle du rayon.\nLa corde est un segment reliant deux points du cercle et ne passant pas par le centre. Ex : la corde [MN].\n\nPour construire un cercle, on utilise un compas. La pointe du compas détermine le centre du cercle et l'écartement détermine son rayon.\n\nÀ toi de tracer un cercle de 2 cm de rayon et de centre O. Puis trace un rayon en rouge [OD], un diamètre en vert [EF], une corde en bleu [GH].",
+  [
+    EX("Les mots du cercle", [
+      Q("Le centre d'un cercle est :", ["à égale distance de tous les points du cercle", "sur le cercle", "à l'extérieur du cercle"], 0, "Tous les points du cercle sont à la même distance du centre."),
+      Q("Le rayon est :", ["la distance entre le centre et un point du cercle", "un segment qui passe par le centre et relie deux points du cercle", "un segment qui ne passe pas par le centre"], 0, "Ex : [OA]."),
+      Q("Le diamètre est :", ["un segment qui passe par le centre et relie deux points du cercle", "la moitié du rayon", "un segment qui ne passe pas par le centre"], 0, "Ex : [BC]."),
+      Q("La corde est :", ["un segment qui relie deux points du cercle sans passer par le centre", "le rayon", "le diamètre"], 0, "Ex : [MN]."),
+      Q("Vrai ou faux : le diamètre est le double du rayon.", VF, 0, "Diamètre = 2 × rayon.")
+    ]),
+    EX("Mesures et compas", [
+      Q("Un cercle a un rayon de 2 cm. Son diamètre mesure :", ["4 cm", "1 cm", "2 cm"], 0, "2 × 2 = 4."),
+      Q("Un cercle a un diamètre de 10 cm. Son rayon mesure :", ["5 cm", "20 cm", "10 cm"], 0, "10 : 2 = 5."),
+      Q("Avec le compas, la pointe détermine :", ["le centre", "le rayon", "le diamètre"], 0, "La pointe est posée sur le centre."),
+      Q("Avec le compas, l'écartement détermine :", ["le rayon", "le centre", "la corde"], 0, "L'écartement donne le rayon."),
+      Q("Vrai ou faux : la corde passe toujours par le centre.", VF, 1, "Si elle passe par le centre, c'est un diamètre.")
+    ])
+  ], true);
+
+var LECON_ESP3 = LN("esp3", "Esp & géom 3 · Connaître les polygones",
+  "Un polygone est une figure formée par une ligne brisée et fermée.\n\nLa figure ABCDE est un polygone qui a cinq côtés et cinq sommets. B est un des sommets. [CD] est un de ses côtés.\n[AD] et [BE] sont des diagonales : elles relient deux sommets non consécutifs du polygone.\n\nA et B sont des sommets consécutifs (sont les extrémités d'un même côté). A et D sont des sommets opposés (non consécutifs).\nLes côtés [AB] et [BC] sont deux côtés consécutifs : ils ont une extrémité commune. Les côtés [AB] et [ED] sont deux côtés opposés : ils n'ont pas d'extrémité commune.\n\nLes polygones ont des noms différents selon leur nombre de côtés : triangle (3 côtés), quadrilatère (4 côtés), pentagone (5 côtés), hexagone (6 côtés), octogone (8 côtés).",
+  [
+    EX("Les noms des polygones", [
+      Q("Un polygone à 3 côtés est :", ["un triangle", "un quadrilatère", "un pentagone"], 0, "3 côtés : triangle."),
+      Q("Un polygone à 5 côtés est :", ["un pentagone", "un hexagone", "un octogone"], 0, "5 côtés : pentagone."),
+      Q("Un polygone à 6 côtés est :", ["un hexagone", "un pentagone", "un octogone"], 0, "6 côtés : hexagone."),
+      Q("Un polygone à 8 côtés est :", ["un octogone", "un hexagone", "un quadrilatère"], 0, "8 côtés : octogone."),
+      Q("Un polygone à 4 côtés est :", ["un quadrilatère", "un triangle", "un pentagone"], 0, "4 côtés : quadrilatère.")
+    ]),
+    EX("Sommets, côtés, diagonales", [
+      Q("Un polygone est une figure formée par :", ["une ligne brisée et fermée", "une courbe", "une droite"], 0, "Une ligne brisée fermée."),
+      Q("Une diagonale relie :", ["deux sommets non consécutifs", "deux sommets consécutifs", "un sommet et le milieu d'un côté"], 0, "Ex : [AD] dans ABCDE."),
+      Q("Deux sommets consécutifs sont :", ["les extrémités d'un même côté", "des sommets opposés", "alignés avec le centre"], 0, "Ex : A et B."),
+      Q("Le polygone ABCDE a :", ["5 côtés et 5 sommets", "4 côtés et 5 sommets", "5 côtés et 4 sommets"], 0, "Autant de côtés que de sommets."),
+      Q("Vrai ou faux : [AB] et [BC] sont deux côtés consécutifs car ils ont une extrémité commune.", VF, 0, "Ils ont le point B en commun.")
+    ])
+  ], true);
+
+var LECON_ESP4 = LN("esp4", "Esp & géom 4 · Connaître les quadrilatères",
+  "Un quadrilatère est un polygone qui possède 4 côtés, 4 sommets et 4 angles. Il existe des quadrilatères particuliers.\n\nLe parallélogramme : ses côtés sont parallèles et égaux deux à deux. Ses diagonales se coupent en leur milieu.\n\nLe rectangle : il a 4 angles droits. Ses côtés sont parallèles et égaux deux à deux. Ses diagonales se coupent en leur milieu ; elles sont de même longueur. Il a 2 axes de symétrie.\n\nLe carré : il a 4 angles droits et 4 côtés égaux. Ses diagonales se coupent en leur milieu ; elles sont perpendiculaires et de même longueur. Il a 4 axes de symétrie.\n\nLe losange : il a 4 côtés égaux et n'a pas d'angles droits. Ses diagonales se coupent en leur milieu ; elles sont perpendiculaires. Il a 2 axes de symétrie.\n\nLe trapèze : il a deux côtés opposés parallèles. Ces deux côtés parallèles sont appelés bases.\nLe trapèze rectangle : un trapèze rectangle est un trapèze qui comporte deux angles droits consécutifs.",
+  [
+    EX("Reconnaître les quadrilatères", [
+      Q("Un quadrilatère a :", ["4 côtés, 4 sommets et 4 angles", "3 côtés", "5 sommets"], 0, "Quadri = 4."),
+      Q("Quel quadrilatère a 4 angles droits et 4 côtés égaux ?", ["le carré", "le losange", "le trapèze"], 0, "C'est la définition du carré."),
+      Q("Quel quadrilatère a 4 côtés égaux et pas d'angles droits ?", ["le losange", "le carré", "le rectangle"], 0, "C'est le losange."),
+      Q("Quel quadrilatère a seulement deux côtés opposés parallèles ?", ["le trapèze", "le rectangle", "le carré"], 0, "Ces côtés s'appellent les bases."),
+      Q("Quel quadrilatère a 4 angles droits mais pas forcément 4 côtés égaux ?", ["le rectangle", "le losange", "le trapèze"], 0, "Le rectangle.")
+    ]),
+    EX("Propriétés", [
+      Q("Combien d'axes de symétrie a un carré ?", ["4", "2", "1"], 0, "4 axes de symétrie."),
+      Q("Combien d'axes de symétrie a un rectangle ?", ["2", "4", "1"], 0, "2 axes de symétrie."),
+      Q("Combien d'axes de symétrie a un losange ?", ["2", "4", "3"], 0, "2 axes de symétrie."),
+      Q("Les diagonales du losange sont :", ["perpendiculaires", "parallèles", "de même longueur toujours"], 0, "Elles se coupent en leur milieu en formant un angle droit."),
+      Q("Vrai ou faux : les diagonales d'un parallélogramme se coupent en leur milieu.", VF, 0, "C'est une propriété du parallélogramme."),
+      Q("Un trapèze rectangle comporte :", ["deux angles droits consécutifs", "quatre angles droits", "aucun angle droit"], 0, "C'est sa définition.")
+    ])
+  ], true);
+
+var LECON_ESP5 = LN("esp5", "Esp & géom 5 · Tracer des quadrilatères (carré, rectangle)",
+  "Le carré est un quadrilatère qui a 4 angles droits et 4 côtés de même longueur.\nLe rectangle est un quadrilatère qui a 4 angles droits. Ses côtés opposés sont parallèles et de même longueur.\n\nPour tracer un carré ou un rectangle, il faut une règle et une équerre : on trace un côté (3 cm pour le carré, 6 cm pour le rectangle de l'exemple), puis on utilise l'équerre pour tracer l'angle droit et le côté suivant, et ainsi de suite.",
+  [
+    EX("Carré et rectangle", [
+      Q("Le carré a :", ["4 angles droits et 4 côtés de même longueur", "4 angles droits et 2 côtés de même longueur", "aucun angle droit"], 0, "C'est la définition du carré."),
+      Q("Le rectangle a :", ["4 angles droits", "4 côtés égaux et aucun angle droit", "3 angles droits"], 0, "Ses côtés opposés sont parallèles et de même longueur."),
+      Q("Pour tracer un carré ou un rectangle, il faut :", ["une règle et une équerre", "un compas seulement", "un rapporteur seulement"], 0, "La règle pour les longueurs, l'équerre pour les angles droits."),
+      Q("Pour tracer un angle droit, j'utilise :", ["l'équerre", "la règle seule", "le compas"], 0, "L'équerre a un angle droit."),
+      Q("Vrai ou faux : un carré est un rectangle particulier.", VF, 0, "Il a 4 angles droits, comme le rectangle.")
+    ]),
+    EX("Les longueurs", [
+      Q("Un carré a un côté de 3 cm. Un autre côté mesure :", ["3 cm", "6 cm", "9 cm"], 0, "Les 4 côtés sont égaux."),
+      Q("Un rectangle a un côté de 6 cm. Le côté opposé mesure :", ["6 cm", "3 cm", "12 cm"], 0, "Les côtés opposés ont la même longueur."),
+      Q("Pour tracer un carré de 3 cm de côté, je trace d'abord :", ["un segment de 3 cm", "un cercle", "une diagonale de 3 cm"], 0, "Puis je trace les angles droits avec l'équerre."),
+      Q("Le périmètre d'un carré de 3 cm de côté est :", ["12 cm", "9 cm", "6 cm"], 0, "4 × 3 = 12."),
+      Q("Vrai ou faux : dans un rectangle, les côtés opposés sont parallèles.", VF, 0, "C'est une propriété du rectangle.")
+    ])
+  ], true);
+
+var LECON_ESP6 = LN("esp6", "Esp & géom 6 · Connaître les triangles",
+  "Un triangle est un polygone qui possède 3 côtés, 3 sommets et 3 angles. Il existe des triangles particuliers.\n\nLe triangle isocèle : il a deux côtés de même longueur.\nLe triangle équilatéral : il a trois côtés de même longueur.\nLe triangle rectangle : il possède un angle droit.",
+  [
+    EX("Les triangles", [
+      Q("Un triangle a :", ["3 côtés, 3 sommets et 3 angles", "4 côtés", "3 côtés et 4 sommets"], 0, "Tri = 3."),
+      Q("Un triangle isocèle a :", ["deux côtés de même longueur", "trois côtés de même longueur", "un angle droit"], 0, "Iso = égal : 2 côtés égaux."),
+      Q("Un triangle équilatéral a :", ["trois côtés de même longueur", "deux côtés de même longueur", "un angle droit"], 0, "Ses 3 côtés sont égaux."),
+      Q("Un triangle rectangle a :", ["un angle droit", "trois côtés égaux", "deux angles droits"], 0, "Il possède un angle droit."),
+      Q("Vrai ou faux : un triangle équilatéral est aussi un triangle isocèle.", VF, 0, "Si 3 côtés sont égaux, 2 côtés le sont aussi.")
+    ]),
+    EX("Reconnaître", [
+      Q("Un triangle a des côtés de 5 cm, 5 cm et 8 cm. Il est :", ["isocèle", "équilatéral", "rectangle"], 0, "Deux côtés égaux."),
+      Q("Un triangle a des côtés de 4 cm, 4 cm et 4 cm. Il est :", ["équilatéral", "isocèle seulement", "rectangle"], 0, "Trois côtés égaux."),
+      Q("Un triangle a un angle droit. Il est :", ["rectangle", "équilatéral", "isocèle"], 0, "Il est rectangle."),
+      Q("Vrai ou faux : un triangle peut avoir deux angles droits.", VF, 1, "Un triangle a au plus un angle droit."),
+      Q("Combien de sommets a un triangle ?", ["3", "4", "6"], 0, "3 sommets.")
+    ])
+  ], true);
+
+var LECON_ESP7 = LN("esp7", "Esp & géom 7 · Tracer des triangles",
+  "Pour construire un triangle rectangle, on utilise une équerre et une règle.\nEx : triangle ABC rectangle en B avec AB = 4 cm et BC = 3 cm : on trace [AB] de 4 cm, on place l'équerre en B pour tracer l'angle droit, on marque C à 3 cm de B, puis on trace [AC].\n\nPour construire un triangle isocèle : on trace 2 segments de même longueur qui ont une extrémité commune. On trace ensuite le 3e côté.",
+  [
+    EX("Tracer des triangles", [
+      Q("Pour tracer un triangle rectangle, on utilise :", ["une équerre et une règle", "un compas seulement", "aucun instrument"], 0, "L'équerre donne l'angle droit."),
+      Q("Pour tracer un triangle isocèle, on commence par tracer :", ["2 segments de même longueur avec une extrémité commune", "3 segments différents", "un cercle"], 0, "Puis on trace le 3e côté."),
+      Q("Pour un triangle ABC rectangle en B, l'angle droit est en :", ["B", "A", "C"], 0, "Rectangle en B : angle droit au sommet B."),
+      Q("Triangle ABC rectangle en B avec AB = 4 cm et BC = 3 cm. On trace d'abord :", ["[AB] de 4 cm", "[AC]", "un cercle de 3 cm"], 0, "Puis l'équerre en B."),
+      Q("Vrai ou faux : pour tracer un angle droit, on utilise l'équerre.", VF, 0, "C'est son rôle.")
+    ]),
+    EX("Étapes de construction", [
+      Q("Dernière étape du triangle isocèle :", ["tracer le 3e côté", "tracer un cercle", "effacer un côté"], 0, "On relie les deux extrémités libres."),
+      Q("Pour reporter 3 cm sur un segment, j'utilise :", ["la règle", "l'équerre seule", "un cercle"], 0, "La règle sert à mesurer."),
+      Q("Dans un triangle isocèle, combien de côtés ont la même longueur ?", ["au moins 2", "aucun", "exactement 4"], 0, "Au moins deux côtés égaux."),
+      Q("Vrai ou faux : on peut construire un triangle rectangle avec une règle et une équerre.", VF, 0, "C'est la méthode de la leçon."),
+      Q("Vrai ou faux : pour construire un triangle isocèle, on trace 2 segments de longueurs différentes.", VF, 1, "Ils doivent avoir la même longueur.")
+    ])
+  ], true);
+
+var LECON_ESP8 = LN("esp8", "Esp & géom 8 · Reconnaître et tracer des perpendiculaires",
+  "Deux droites sont perpendiculaires si elles se coupent en formant des angles droits.\nLes droites (a) et (b) sont perpendiculaires. On note (a) ⊥ (b).\nLes droites (c) et (d) ne sont pas perpendiculaires.\n\nPour vérifier que deux droites sont perpendiculaires, on utilise l'équerre.\n\nPour tracer des droites perpendiculaires :\n1. On trace une droite (d). On marque un point A sur la droite.\n2. On place l'angle droit de l'équerre sur le point. On trace la seconde droite.\n3. On prolonge la seconde droite avec la règle.",
+  [
+    EX("Reconnaître", [
+      Q("Deux droites perpendiculaires se coupent en formant :", ["des angles droits", "des angles aigus seulement", "aucun angle"], 0, "Ce sont des angles droits."),
+      Q("Pour vérifier que deux droites sont perpendiculaires, on utilise :", ["l'équerre", "le compas", "la règle graduée seulement"], 0, "L'équerre vérifie les angles droits."),
+      Q("Le symbole de la perpendicularité est :", ["⊥", "//", "="], 0, "(a) ⊥ (b)."),
+      Q("Vrai ou faux : si (a) ⊥ (b), alors (a) et (b) forment des angles droits.", VF, 0, "C'est la définition."),
+      Q("Deux droites qui se coupent sans angle droit :", ["ne sont pas perpendiculaires", "sont perpendiculaires", "sont parallèles"], 0, "Ex : (c) et (d) dans la leçon.")
+    ]),
+    EX("Tracer", [
+      Q("Pour tracer une perpendiculaire à (d) passant par A, on place :", ["l'angle droit de l'équerre sur le point", "le compas sur A", "la règle en biais"], 0, "On aligne un côté de l'équerre sur (d)."),
+      Q("Première étape :", ["tracer une droite et marquer un point dessus", "tracer un cercle", "mesurer un angle"], 0, "On trace (d) et on marque A."),
+      Q("Dernière étape :", ["prolonger la seconde droite avec la règle", "effacer la première droite", "tracer un carré"], 0, "On trace la droite entière."),
+      Q("Vrai ou faux : on trace une perpendiculaire avec une équerre.", VF, 0, "C'est la méthode de la leçon."),
+      Q("Vrai ou faux : on trace une perpendiculaire avec un compas seulement.", VF, 1, "On utilise l'équerre.")
+    ])
+  ], true);
+
+var LECON_ESP9 = LN("esp9", "Esp & géom 9 · Reconnaître et tracer des parallèles",
+  "Deux droites parallèles ont toujours le même écartement : elles ne se coupent pas, même si on les prolonge.\nLes droites (a) et (b) sont parallèles. On note (a) // (b).\nLes droites (c) et (d) ne sont pas parallèles.\n\nPour vérifier que les droites (a) et (b) sont parallèles, on place la règle et l'équerre de façon perpendiculaire à la droite (b) et on mesure l'écartement à deux endroits différents.\n\nPour tracer deux droites parallèles :\n1. On trace une droite (a). Avec l'équerre, on trace deux droites perpendiculaires.\n2. Avec la règle, on mesure deux fois le même écartement et on les signale par deux points.\n3. On trace une droite (b) passant par les deux points.",
+  [
+    EX("Reconnaître", [
+      Q("Deux droites parallèles :", ["ne se coupent pas, même prolongées", "se coupent toujours", "forment toujours un angle droit"], 0, "Elles ont toujours le même écartement."),
+      Q("Le symbole du parallélisme est :", ["//", "⊥", "="], 0, "(a) // (b)."),
+      Q("Pour vérifier que deux droites sont parallèles, on mesure :", ["l'écartement à deux endroits différents", "un angle", "le rayon d'un cercle"], 0, "Il doit être le même."),
+      Q("Vrai ou faux : deux droites parallèles ont toujours le même écartement.", VF, 0, "C'est la définition."),
+      Q("Vrai ou faux : deux droites qui se coupent sont parallèles.", VF, 1, "Des droites parallèles ne se coupent pas.")
+    ]),
+    EX("Tracer", [
+      Q("Pour tracer deux droites parallèles, on trace d'abord :", ["une droite (a) puis deux perpendiculaires", "un cercle", "un carré"], 0, "Avec l'équerre."),
+      Q("Ensuite, avec la règle, on :", ["mesure deux fois le même écartement", "mesure deux écartements différents", "trace un angle"], 0, "Même écartement des deux côtés."),
+      Q("Enfin, on trace la droite (b) :", ["passant par les deux points", "au hasard", "perpendiculaire à (a)"], 0, "Elle passe par les deux points marqués."),
+      Q("Quels instruments utilise-t-on pour tracer des parallèles ?", ["la règle et l'équerre", "le compas seulement", "le rapporteur seulement"], 0, "Règle et équerre."),
+      Q("Deux droites perpendiculaires à une même droite sont :", ["parallèles entre elles", "perpendiculaires entre elles", "confondues"], 0, "C'est ce que l'on utilise pour les tracer.")
+    ])
+  ], true);
+
+var LECON_ESP10 = LN("esp10", "Esp & géom 10 · Reconnaître la symétrie axiale",
+  "Deux figures sont symétriques l'une par rapport à l'autre si :\n- elles sont à la même distance de l'axe de symétrie,\nET\n- si elles se superposent parfaitement par pliage suivant l'axe.\n\nL'axe de symétrie est une droite qui partage une figure en deux parties parfaitement superposables par pliage.\n\nUne figure géométrique peut avoir plusieurs axes de symétrie ou n'en avoir aucun. Une étoile à 4 branches a 4 axes de symétrie. Un parallélogramme n'a aucun axe de symétrie.",
+  [
+    EX("Axe de symétrie", [
+      Q("L'axe de symétrie partage une figure en :", ["deux parties superposables par pliage", "trois parties égales", "deux parties différentes"], 0, "Si on plie, les deux parties se superposent."),
+      Q("Deux figures symétriques sont :", ["à la même distance de l'axe", "de formes différentes", "toujours collées"], 0, "Et elles se superposent par pliage."),
+      Q("Une figure peut avoir :", ["plusieurs axes de symétrie ou aucun", "toujours un seul axe", "toujours deux axes"], 0, "Cela dépend de la figure."),
+      Q("Vrai ou faux : un parallélogramme n'a aucun axe de symétrie.", VF, 0, "C'est l'exemple de la leçon."),
+      Q("Vrai ou faux : une figure a toujours un axe de symétrie.", VF, 1, "Certaines figures n'en ont aucun.")
+    ]),
+    EX("Compter les axes", [
+      Q("Combien d'axes de symétrie a un carré ?", ["4", "2", "1"], 0, "4 axes."),
+      Q("Combien d'axes de symétrie a un rectangle (non carré) ?", ["2", "4", "0"], 0, "2 axes."),
+      Q("Combien d'axes de symétrie a l'étoile à 4 branches de la leçon ?", ["4", "2", "1"], 0, "4 axes de symétrie."),
+      Q("Combien d'axes de symétrie a un parallélogramme non rectangle ?", ["aucun", "1", "2"], 0, "Aucun axe de symétrie."),
+      Q("Pour vérifier si une droite est un axe de symétrie, on peut :", ["plier la figure suivant cette droite", "mesurer le périmètre", "compter les sommets"], 0, "Les deux parties doivent se superposer.")
+    ])
+  ], true);
+
+var LECON_ESP11 = LN("esp11", "Esp & géom 11 · Tracer une figure par symétrie axiale",
+  "On peut construire le symétrique d'une figure par rapport à un axe :\n- par pliage et découpage : on plie le papier suivant l'axe, on découpe la figure, on déplie ;\n- en prenant des repères sur un quadrillage et en reportant les points d'une figure : un point et son symétrique sont à la même distance de l'axe. Exemple : si un point est à 4 carreaux de l'axe, son symétrique est à 4 carreaux de l'autre côté.",
+  [
+    EX("Construire le symétrique", [
+      Q("Par pliage et découpage, on plie le papier suivant :", ["l'axe de symétrie", "un côté du papier", "une diagonale"], 0, "On plie sur l'axe."),
+      Q("Sur un quadrillage, un point est à 4 carreaux de l'axe. Son symétrique est à :", ["4 carreaux de l'axe, de l'autre côté", "2 carreaux de l'axe", "8 carreaux du même côté"], 0, "Même distance de l'axe."),
+      Q("Un point est à 7 carreaux de l'axe. Son symétrique est à :", ["7 carreaux de l'autre côté", "14 carreaux du même côté", "3 carreaux"], 0, "Même distance, de l'autre côté."),
+      Q("Vrai ou faux : un point et son symétrique sont à la même distance de l'axe.", VF, 0, "C'est la définition de la symétrie."),
+      Q("Vrai ou faux : le symétrique d'un point est du même côté de l'axe.", VF, 1, "Il est de l'autre côté de l'axe.")
+    ]),
+    EX("Méthode", [
+      Q("Pour tracer le symétrique d'une figure sur un quadrillage, on :", ["reporte les points un par un de l'autre côté de l'axe", "recopie la figure au même endroit", "mesure les angles"], 0, "Chaque point est reporté à la même distance de l'axe."),
+      Q("Après avoir placé tous les points symétriques, on :", ["les relie dans le même ordre", "les efface", "les relie au hasard"], 0, "On reconstruit la figure."),
+      Q("La figure de départ et son symétrique se superposent :", ["par pliage suivant l'axe", "par glissement", "en tournant de 90 degrés"], 0, "C'est la symétrie axiale."),
+      Q("Vrai ou faux : on peut construire un symétrique en pliant et en découpant.", VF, 0, "C'est la première méthode de la leçon."),
+      Q("Un point est sur l'axe de symétrie. Son symétrique est :", ["lui-même", "de l'autre côté de l'axe", "très loin"], 0, "Il est à une distance 0 de l'axe.")
+    ])
+  ], true);
+
+var LECON_ESP12 = LN("esp12", "Esp & géom 12 · Suivre un programme de construction",
+  "Pour construire une figure géométrique, on peut suivre un programme de construction. Pour cela, il faut :\n- connaître le vocabulaire spécifique de la géométrie ;\n- connaître les propriétés des figures ;\n- lire l'ensemble des indications avant de commencer, puis les suivre pas à pas ;\n- vérifier que l'on a les instruments nécessaires à la construction de la figure.\n\nAvant de construire la figure, on peut faire un dessin à main levée.\n\nEx : « Trace un carré ABCD de 3 cm de côté. Trace un demi-cercle de diamètre [AB] à l'extérieur du carré. Trace les diagonales [AC] et [BD] du carré. »",
+  [
+    EX("Programme de construction", [
+      Q("Avant de commencer, il faut :", ["lire toutes les indications", "tracer tout de suite", "ne lire que la première consigne"], 0, "On lit tout avant de commencer."),
+      Q("Avant de construire la figure, on peut faire :", ["un dessin à main levée", "un découpage", "une multiplication"], 0, "Cela aide à comprendre la figure."),
+      Q("Il faut aussi vérifier :", ["que l'on a les instruments nécessaires", "la météo", "l'heure"], 0, "Règle, équerre, compas..."),
+      Q("Dans l'exemple, le carré ABCD a pour côté :", ["3 cm", "6 cm", "4 cm"], 0, "Carré ABCD de 3 cm de côté."),
+      Q("Vrai ou faux : on suit les indications pas à pas.", VF, 0, "C'est la consigne de la leçon.")
+    ]),
+    EX("Dans l'exemple", [
+      Q("Dans l'exemple, le demi-cercle a pour diamètre :", ["[AB]", "[AC]", "[BD]"], 0, "Demi-cercle de diamètre [AB]."),
+      Q("Le demi-cercle est tracé :", ["à l'extérieur du carré", "à l'intérieur du carré", "sur la diagonale"], 0, "À l'extérieur du carré."),
+      Q("Les diagonales du carré sont :", ["[AC] et [BD]", "[AB] et [CD]", "[AD] et [BC]"], 0, "Elles relient deux sommets opposés."),
+      Q("Pour construire cette figure, il faut connaître :", ["le vocabulaire et les propriétés des figures", "seulement les couleurs", "seulement les nombres"], 0, "C'est dans la leçon."),
+      Q("Vrai ou faux : on peut construire la figure sans lire le programme.", VF, 1, "Il faut le lire et le suivre.")
+    ])
+  ], true);
+
+var LECON_ESP13 = LN("esp13", "Esp & géom 13 · Connaître les solides",
+  "Les formes géométriques en volume s'appellent des solides.\nLes solides dont toutes les faces sont des polygones sont des polyèdres. Un polyèdre comporte des faces, des arêtes et des sommets.\nIl existe des solides qui ont des faces qui ne sont pas des polygones comme la sphère, le cylindre...\n\nPolyèdres : le cube, le pavé droit, le prisme. Non polyèdres : le cône, le cylindre.\nPour construire un solide, on fabrique un patron. Chaque solide a plusieurs patrons.\n\nEXEMPLES DE SOLIDES\nUn cube a 6 faces qui sont toutes des carrés identiques. Pour décrire un cube, il suffit d'indiquer la longueur d'une de ses arêtes.\nUne pyramide a une face qui est appelée la base. Ses autres faces sont des triangles. Le nombre de triangles est égal au nombre de côtés de la base. Les triangles ont un sommet commun qui est appelé le sommet de la pyramide.\nUn pavé droit a 6 faces. Toutes ses faces sont des rectangles ou des carrés. Les faces opposées sont identiques.\nUn prisme droit a 2 faces qui sont des polygones identiques : les bases. Toutes ses autres faces sont des rectangles ou des carrés.\n- Prisme droit à base triangulaire : les bases sont des triangles, les 3 autres faces sont des rectangles.\n- Prisme droit à base hexagonale : les bases sont des polygones à 6 côtés, les 6 autres faces sont des rectangles.",
+  [
+    EX("Les solides", [
+      Q("Un polyèdre est un solide dont toutes les faces sont :", ["des polygones", "des cercles", "des courbes"], 0, "Ex : cube, pavé droit, prisme."),
+      Q("Quel solide n'est pas un polyèdre ?", ["le cylindre", "le cube", "le pavé droit"], 0, "Le cylindre a une face courbe."),
+      Q("Combien de faces a un cube ?", ["6", "4", "8"], 0, "6 faces carrées identiques."),
+      Q("Combien de faces a un pavé droit ?", ["6", "4", "5"], 0, "6 faces rectangles ou carrés."),
+      Q("Un polyèdre comporte :", ["des faces, des arêtes et des sommets", "seulement des faces", "des cercles"], 0, "Faces, arêtes et sommets.")
+    ]),
+    EX("Pyramide, prisme et patron", [
+      Q("Les autres faces d'une pyramide (en dehors de la base) sont :", ["des triangles", "des carrés", "des cercles"], 0, "Des triangles qui se rejoignent au sommet."),
+      Q("Une pyramide dont la base a 4 côtés a :", ["4 triangles", "3 triangles", "6 triangles"], 0, "Autant de triangles que de côtés de la base."),
+      Q("Un prisme droit à base triangulaire a :", ["2 triangles et 3 rectangles", "3 triangles et 2 rectangles", "5 triangles"], 0, "2 bases triangulaires + 3 faces rectangulaires."),
+      Q("Un prisme droit à base hexagonale a :", ["2 hexagones et 6 rectangles", "6 hexagones et 2 rectangles", "8 triangles"], 0, "Les bases ont 6 côtés."),
+      Q("Pour construire un solide, on fabrique :", ["un patron", "un compas", "un quadrillage"], 0, "Le patron se plie pour former le solide."),
+      Q("Vrai ou faux : pour décrire un cube, il suffit de donner la longueur d'une arête.", VF, 0, "Toutes les arêtes d'un cube sont égales.")
+    ])
+  ], true);
+
+var LECON_ESP14 = LN("esp14", "Esp & géom 14 · Se repérer sur un quadrillage",
+  "Les plans ou les cartes sont des dessins simplifiés de lieux existants : ils permettent de se repérer ou de se déplacer facilement dans l'espace.\n\nPour se repérer ou se déplacer, on peut utiliser un quadrillage : grâce aux codages de ses axes horizontaux et verticaux, on détermine précisément les coordonnées d'un nœud ou d'une case.\n\nOn commence toujours par citer les coordonnées d'un point par le repère de l'axe horizontal puis celui de l'axe vertical.\n\nExemple : les coordonnées du point K sont : K (D ; 4). Les coordonnées du point X sont : X (B ; 1).",
+  [
+    EX("Les coordonnées", [
+      Q("On cite d'abord le repère de :", ["l'axe horizontal", "l'axe vertical", "la diagonale"], 0, "Horizontal puis vertical."),
+      Q("Les coordonnées du point K sont :", ["(D ; 4)", "(4 ; D)", "(K ; 4)"], 0, "D sur l'axe horizontal, 4 sur l'axe vertical."),
+      Q("Les coordonnées du point X sont :", ["(B ; 1)", "(1 ; B)", "(B ; 4)"], 0, "B sur l'axe horizontal, 1 sur l'axe vertical."),
+      Q("Un plan est :", ["un dessin simplifié d'un lieu", "une photo du lieu", "un solide"], 0, "Il permet de se repérer."),
+      Q("Vrai ou faux : on cite l'axe horizontal avant l'axe vertical.", VF, 0, "Par exemple (D ; 4).")
+    ]),
+    EX("Se repérer", [
+      Q("Le point (C ; 3) se trouve :", ["dans la colonne C, à la ligne 3", "dans la colonne 3, à la ligne C", "en C3 dans le ciel"], 0, "Lettre = horizontal, nombre = vertical."),
+      Q("Un point est dans la colonne A, à la ligne 5. Ses coordonnées sont :", ["(A ; 5)", "(5 ; A)", "(A ; A)"], 0, "Horizontal d'abord."),
+      Q("Les quadrillages ont des axes :", ["horizontaux et verticaux", "seulement horizontaux", "seulement obliques"], 0, "Ils servent à repérer."),
+      Q("Vrai ou faux : (D ; 4) et (4 ; D) s'écrivent de la même façon dans la leçon.", VF, 1, "On écrit toujours l'axe horizontal en premier : (D ; 4)."),
+      Q("Les cartes servent à :", ["se repérer et se déplacer", "colorier", "compter les arêtes"], 0, "Ce sont des dessins simplifiés de lieux.")
+    ])
+  ], true);
+
+var LECON_ESP15 = LN("esp15", "Esp & géom 15 · Utiliser un logiciel de programmation",
+  "Il existe plusieurs logiciels de programmation en ligne : Scratch, code.org...\nCes logiciels permettent d'écrire des scripts (petits programmes) pour animer (faire se déplacer dans un environnement) un personnage ou un objet.\n\nPour animer l'objet ou le personnage, on choisit et on assemble des blocs de commande dans un ordre précis : c'est le script.\n\nLa scène est la zone où le personnage s'anime. Les blocs de commande sont à disposition, par exemple : avancer plus, tourner à gauche, tourner à droite.",
+  [
+    EX("Programmation", [
+      Q("Scratch et code.org sont :", ["des logiciels de programmation en ligne", "des jeux de société", "des instruments de géométrie"], 0, "Ils permettent d'écrire des scripts."),
+      Q("Un script est :", ["un petit programme", "une carte", "un solide"], 0, "Il est formé de blocs de commande assemblés."),
+      Q("Pour animer un personnage, on assemble des blocs de commande :", ["dans un ordre précis", "dans n'importe quel ordre", "sans les lire"], 0, "L'ordre compte."),
+      Q("La scène est :", ["la zone où le personnage s'anime", "la liste des blocs", "le script"], 0, "C'est l'endroit où il se déplace."),
+      Q("Vrai ou faux : l'ordre des blocs de commande a de l'importance.", VF, 0, "Le script s'exécute dans l'ordre.")
+    ]),
+    EX("Les blocs", [
+      Q("Un bloc de commande est :", ["une instruction", "un personnage", "un décor"], 0, "Ex : avancer, tourner à gauche."),
+      Q("Quel bloc fait se déplacer le personnage ?", ["avancer", "colorier", "plier"], 0, "Le bloc avancer."),
+      Q("Quel bloc change la direction du personnage ?", ["tourner à droite", "avancer plus", "démarrer"], 0, "Tourner à droite ou à gauche."),
+      Q("Animer, c'est :", ["faire se déplacer un personnage ou un objet", "l'effacer", "le colorier"], 0, "C'est la définition de la leçon."),
+      Q("Vrai ou faux : les blocs de commande sont assemblés pour former le script.", VF, 0, "Oui.")
+    ])
+  ], true);
+
+
 var MATIERES = [
   { id: "francais", nom: "Français", themes: [
     { id: "ecriture", nom: "Écriture", special: "ecriture" },
@@ -732,11 +1684,10 @@ var MATIERES = [
   ] },
   { id: "dictees", nom: "Dictées", themes: themesDictees() },
   { id: "maths", nom: "Mathématiques", themes: [
-    { id: "nombres", nom: "Nombres et calculs", lecons: [LECON_ROMAINS] },
-    { id: "mesures", nom: "Grandeurs et mesures", lecons: [LECON_HEURE] },
-    { id: "geometrie", nom: "Espace et géométrie", lecons: [] },
-    { id: "problemes", nom: "Résolution de problèmes", lecons: [] },
-    { id: "donnees", nom: "Données et proportionnalité", lecons: [] }
+    { id: "nombres", nom: "Nombres et fractions (Num)", lecons: [LECON_NUM0, LECON_NUM1, LECON_NUM2, LECON_NUM3, LECON_NUM4, LECON_NUM5, LECON_NUM6, LECON_NUM7, LECON_NUM8, LECON_NUM9, LECON_NUM10, LECON_NUM11, LECON_NUM12, LECON_NUM13, LECON_NUM14, LECON_NUM15, LECON_NUM16, LECON_NUM17, LECON_ROMAINS] },
+    { id: "calculs", nom: "Calculs (Calc)", lecons: [LECON_CALC1, LECON_CALC2, LECON_CALC3, LECON_TABLES, LECON_CALC4, LECON_CALC5, LECON_CALC6, LECON_CALC7, LECON_CALC8, LECON_CALC9, LECON_CALC10, LECON_CALC11, LECON_CALC12, LECON_CALC13, LECON_CALC13B] },
+    { id: "geometrie", nom: "Espace et géométrie (Esp & géom)", lecons: [LECON_ESP1, LECON_ESP2, LECON_ESP3, LECON_ESP4, LECON_ESP5, LECON_ESP6, LECON_ESP7, LECON_ESP8, LECON_ESP9, LECON_ESP10, LECON_ESP11, LECON_ESP12, LECON_ESP13, LECON_ESP14, LECON_ESP15] },
+    { id: "mesures", nom: "Grandeurs et mesures", lecons: [LECON_HEURE] }
   ] },
   { id: "autres", nom: "Autres matières", themes: [
     { id: "histoire-geo", nom: "Histoire et géographie", lecons: [] },
@@ -884,6 +1835,10 @@ function mergeState(a, b) {
   for (i = 0; i < lgs.length; i++) { if (lgs[i] && !lgv[lgs[i].id]) { lgv[lgs[i].id] = 1; lgo.push(lgs[i]); } }
   lgo.sort(function (x, y) { return x.id - y.id; });
   m.log = rogneLog(lgo);
+  m.dev = {};
+  var da = a.dev || {}, db = b.dev || {}, di, dk;
+  for (di in da) { if (da.hasOwnProperty(di)) { m.dev[di] = {}; for (dk in da[di]) { if (da[di].hasOwnProperty(dk)) { m.dev[di][dk] = da[di][dk]; } } } }
+  for (di in db) { if (db.hasOwnProperty(di)) { if (!m.dev[di]) { m.dev[di] = {}; } for (dk in db[di]) { if (db[di].hasOwnProperty(dk) && !(db[di][dk] <= m.dev[di][dk])) { m.dev[di][dk] = db[di][dk]; } } } }
   var pa = a.plan, pb = b.plan;
   if (pb && (!pa || (pb.done || 0) > (pa.done || 0))) { m.plan = JSON.parse(JSON.stringify(pb)); }
   if (m.plan && pa && pb) { m.plan.n = Math.max(pa.n || 0, pb.n || 0, m.plan.n || 0) || undefined; }
@@ -954,6 +1909,7 @@ function itemsQuiz() {
   var main = [], autres = [], all = lecons();
   for (var i = 0; i < all.length; i++) {
     var l = all[i].l;
+    if (l.horsQuiz) { continue; }
     for (var e = 0; e < l.exos.length; e++) {
       if (l.exos[e].texte) { continue; }
       for (var q = 0; q < l.exos[e].qs.length; q++) {
@@ -1174,6 +2130,8 @@ function showHome() {
   if (qz.streak > 0) { h += '<p class="petit">' + qz.streak + ' jour' + (qz.streak > 1 ? "s" : "") + ' de suite</p>'; }
   if (encQ) { h += '<button class="bouton" id="b-quiz-reprise">Reprendre le quiz</button></div>'; }
   else { h += '<button class="bouton" id="b-quiz">' + (fait ? "Faire un autre quiz" : "Faire un quiz") + '</button></div>'; }
+  var devOn = devActifs().length > 0;
+  h += '<div class="carte"><h2>Devoirs de la maîtresse</h2><p>' + (devOn ? 'Les leçons à apprendre et les mini-quiz pour l\'école.' : 'Pas de devoir pour le moment.') + '</p><button class="bouton" id="b-dev"' + (devOn ? '' : ' disabled style="opacity:.4"') + '>Voir mes devoirs</button></div>';
   h += '<div class="carte"><h2>Mes matières</h2>';
   for (var i = 0; i < MATIERES.length; i++) {
     h += '<button class="option" id="m' + i + '">' + esc(MATIERES[i].nom) + '</button>';
@@ -1185,11 +2143,115 @@ function showHome() {
   bind("b-comp", showComp);
   bind("b-quiz", function () { startQuiz(fait); });
   bind("b-quiz-reprise", function () { lancerSerie("quiz"); });
+  bind("b-dev", showDevoirs);
   bind("b-prog", showProgression);
   bind("b-prof", showProf);
   for (var k = 0; k < MATIERES.length; k++) {
     (function (n) { bind("m" + n, function () { showMatiere(n); }); })(k);
   }
+}
+
+
+/* ---------- Devoirs de la maîtresse ---------- */
+/* Pour ajouter un devoir : une ligne dans DEVOIRS { id, date: "AAAA-MM-JJ" (jour pour lequel il est donné), titre, lecons: [ids] }.
+   Le module n'est actif que jusqu'à cette date incluse ; sans devoir actif, le bouton est grisé. */
+var DEVOIRS = [];
+var NB_DEV_SERIES = 5, NB_DEV_Q = 10;
+function devActif(d) { return !!d.date && d.date >= isoToday(); }
+function devActifs() { var r = []; for (var i = 0; i < DEVOIRS.length; i++) { if (devActif(DEVOIRS[i])) { r.push(DEVOIRS[i]); } } return r; }
+function devParId(id) { for (var i = 0; i < DEVOIRS.length; i++) { if (DEVOIRS[i].id === id) { return DEVOIRS[i]; } } return null; }
+function leconDev(lid) { var a = lecons(); for (var i = 0; i < a.length; i++) { if (a[i].l.id === lid) { return a[i]; } } return null; }
+function devScores(id) { if (!state.dev) { state.dev = {}; } if (!state.dev[id]) { state.dev[id] = {}; } return state.dev[id]; }
+function devFaits(d) { var sc = devScores(d.id), n = 0; for (var k = 0; k < NB_DEV_SERIES; k++) { if (sc[k] !== undefined) { n++; } } return n; }
+function rngSeed(str) {
+  var h = 7;
+  for (var i = 0; i < str.length; i++) { h = (h * 31 + str.charCodeAt(i)) % 2147483647; }
+  return function () { h = (h * 48271) % 2147483647; return h / 2147483647; };
+}
+function melangeSeed(arr, rnd) {
+  var a = arr.slice(), i, j, t;
+  for (i = a.length - 1; i > 0; i--) { j = Math.floor(rnd() * (i + 1)); t = a[i]; a[i] = a[j]; a[j] = t; }
+  return a;
+}
+function devPool(d) {
+  var rnd = rngSeed(d.id), listes = [], i, e, q, k;
+  for (i = 0; i < d.lecons.length; i++) {
+    var x = leconDev(d.lecons[i]);
+    if (!x) { continue; }
+    var l = [];
+    for (e = 0; e < x.l.exos.length; e++) {
+      if (x.l.exos[e].texte) { continue; }
+      for (q = 0; q < x.l.exos[e].qs.length; q++) { l.push({ lid: x.l.id, e: e, q: q, t: x.t, l: x.l }); }
+    }
+    listes.push(melangeSeed(l, rnd));
+  }
+  var pool = [], reste = true;
+  for (k = 0; reste; k++) {
+    reste = false;
+    for (i = 0; i < listes.length; i++) { if (k < listes[i].length) { pool.push(listes[i][k]); reste = true; } }
+  }
+  return pool;
+}
+function buildDevQuiz(d, serie) {
+  var pool = devPool(d), out = [], n = pool.length, i;
+  if (n === 0) { return []; }
+  var nb = Math.min(NB_DEV_Q, n);
+  for (i = 0; i < nb; i++) { out.push(questionDe(pool[(serie * NB_DEV_Q + i) % n])); }
+  return melangeTab(out, Math.random);
+}
+function showDevoirs() {
+  var h = '<div class="carte"><h2>Devoirs de la maîtresse</h2><p>Les leçons à apprendre pour l\'école. Lis la leçon, fais les exercices, puis passe les 5 mini-quiz de 10 questions.</p></div>';
+  if (!devActifs().length) { h += '<div class="carte"><p>Aucun devoir pour le moment.</p></div>'; }
+  for (var i = DEVOIRS.length - 1; i >= 0; i--) {
+    var d = DEVOIRS[i];
+    if (!devActif(d)) { continue; }
+    h += '<button class="option" id="dv' + i + '">' + esc(d.titre) + (d.date ? ' · ' + esc(dateLisible(d.date)) : '') + '<br><span class="petit">Mini-quiz faits : ' + devFaits(d) + ' / ' + NB_DEV_SERIES + '</span></button>';
+  }
+  h += '<button class="bouton second" id="b-ret">Retour</button>';
+  go(h);
+  bind("b-ret", showHome);
+  for (var k = 0; k < DEVOIRS.length; k++) { (function (n) { bind("dv" + n, function () { showDevoir(DEVOIRS[n].id); }); })(k); }
+}
+function showDevoir(id) {
+  var d = devParId(id), sc = devScores(id), i, k;
+  if (!d) { showDevoirs(); return; }
+  var h = '<div class="carte"><h2>' + esc(d.titre) + '</h2>' + (d.date ? '<p class="petit">' + esc(dateLisible(d.date)) + '</p>' : '') + '<p><b>1. Les leçons à voir</b></p>';
+  for (i = 0; i < d.lecons.length; i++) {
+    var x = leconDev(d.lecons[i]);
+    if (x) { h += '<button class="option" id="dl' + i + '">' + esc(x.l.titre) + '</button>'; }
+  }
+  h += '</div><div class="carte"><p><b>2. Les mini-quiz</b></p><p class="petit">Chaque mini-quiz a 10 questions différentes.</p>';
+  for (k = 0; k < NB_DEV_SERIES; k++) {
+    var v = sc[k];
+    h += '<button class="option" id="dq' + k + '">Mini-quiz ' + (k + 1) + (v !== undefined ? ' · meilleur score ' + v + ' / ' + NB_DEV_Q + (v >= 9 ? ' ★' : '') : '') + '</button>';
+  }
+  h += '</div><button class="bouton second" id="b-ret">Retour</button>';
+  go(h);
+  bind("b-ret", showDevoirs);
+  for (i = 0; i < d.lecons.length; i++) { (function (n) { bind("dl" + n, function () { showLeconDev(id, d.lecons[n]); }); })(i); }
+  for (k = 0; k < NB_DEV_SERIES; k++) { (function (n) { bind("dq" + n, function () { lancerDevQuiz(id, n); }); })(k); }
+}
+function showLeconDev(id, lid) {
+  var x = leconDev(lid);
+  if (!x) { showDevoir(id); return; }
+  var l = x.l;
+  var h = '<div class="carte"><h2>' + esc(l.titre) + '</h2>';
+  if (l.resume) { h += '<div class="lecon-txt">' + esc(l.resume).replace(/\n/g, "<br>") + '</div>'; }
+  h += '</div><div class="carte"><p><b>Exercices</b></p>';
+  for (var e = 0; e < l.exos.length; e++) { if (!l.exos[e].texte) { h += '<button class="option" id="x' + e + '">' + esc(l.exos[e].titre) + '</button>'; } }
+  h += '</div><button class="bouton second" id="b-ret">Retour</button>';
+  go(h);
+  bind("b-ret", function () { showDevoir(id); });
+  for (var b = 0; b < l.exos.length; b++) {
+    (function (y) {
+      bind("x" + y, function () { startEx(l.exos[y], { kind: "lecon", g: x.t.id, lid: l.id, back: function () { showLeconDev(id, lid); } }); });
+    })(b);
+  }
+}
+function lancerDevQuiz(id, serie) {
+  var d = devParId(id), qs = d ? buildDevQuiz(d, serie) : [];
+  if (!qs.length) { showDevoir(id); return; }
+  startEx({ titre: d.titre + " · mini-quiz " + (serie + 1), qs: qs }, { kind: "devoir", g: "devoirs", dev: id, serie: serie, back: function () { showDevoir(id); }, again: serie < NB_DEV_SERIES - 1 ? function () { lancerDevQuiz(id, serie + 1); } : null });
 }
 
 /* ---------- Matières, thèmes, leçons ---------- */
@@ -1518,6 +2580,7 @@ function finishEx() {
     }
     if (state.enc) { state.enc[ctx.kind] = null; }
   }
+  if (ctx.kind === "devoir") { var dvs = devScores(ctx.dev); if (dvs[ctx.serie] === undefined || cur.correct > dvs[ctx.serie]) { dvs[ctx.serie] = cur.correct; } }
   if (ctx.kind === "lecon" && ctx.lid) { if (!state.exi) { state.exi = {}; } state.exi[ctx.lid] = (state.exi[ctx.lid] || 0) + 1; }
   logExercice({ id: new Date().getTime(), d: today(), h: heureNow(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, n: ex.qs.length, ok: cur.correct, qs: cur.rep || [], w: cur.written || "", qe: ex.ecrit || "" });
   state.history.push({ d: today(), k: ctx.kind, g: ctx.g, t: ex.titre, s: s, w: cur.wrong, e: cur.written, q: ex.ecrit || "", l: ctx.lvl || 0 });
