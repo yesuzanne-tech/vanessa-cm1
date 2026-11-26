@@ -883,7 +883,7 @@ function mergeState(a, b) {
   var lgv = {}, lgs = (b.log || []).concat(a.log || []), lgo = [];
   for (i = 0; i < lgs.length; i++) { if (lgs[i] && !lgv[lgs[i].id]) { lgv[lgs[i].id] = 1; lgo.push(lgs[i]); } }
   lgo.sort(function (x, y) { return x.id - y.id; });
-  m.log = lgo.length > LOG_MAX ? lgo.slice(lgo.length - LOG_MAX) : lgo;
+  m.log = rogneLog(lgo);
   var pa = a.plan, pb = b.plan;
   if (pb && (!pa || (pb.done || 0) > (pa.done || 0))) { m.plan = JSON.parse(JSON.stringify(pb)); }
   if (m.plan && pa && pb) { m.plan.n = Math.max(pa.n || 0, pb.n || 0, m.plan.n || 0) || undefined; }
@@ -1537,6 +1537,8 @@ function showResult(info) {
   h += '<div class="etoiles">' + etoiles + '</div>';
   h += '<div class="note">' + ((ctx.kind === "quiz" || ctx.kind === "genre") ? cur.correct + ' / ' + cur.ex.qs.length : s + ' / 10') + '</div>';
   h += '<p>' + msg + '</p>';
+  var dernierLog = state.log && state.log.length ? state.log[state.log.length - 1] : null;
+  if (dernierLog && dernierLog.qs && dernierLog.qs.length) { h += '<details class="ex" style="text-align:left;margin:12px 0"><summary>📋 Voir mes réponses</summary>' + detailExercice(dernierLog) + '</details>'; }
   if (cur.written) { h += '<button class="bouton" id="b-envoi">Envoyer ma réponse à mon professeur</button>'; }
   if (ctx.again) { h += '<button class="bouton" id="b-again">Exercice suivant</button>'; }
   h += '<button class="bouton second" id="b-back">' + (ctx.kind === "comp" ? "Retour à la compréhension" : ((ctx.kind === "quiz" || ctx.kind === "genre") ? "Retour à l'accueil" : "Retour")) + '</button>';
@@ -1728,6 +1730,8 @@ function statsPour(g) {
 /* ---------- Journal détaillé des exercices ---------- */
 var LOG_MAX = 25;
 function cutTxt(t, n) { t = String(t == null ? "" : t); return t.length > n ? t.slice(0, n - 1) + "…" : t; }
+var MOIS_V = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"], JOURS_V = ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"];
+function dateLisible(d) { var p = String(d).split("/"); if (p.length !== 3) { return d; } var j = new Date(+p[2], +p[1] - 1, +p[0]); return p[0] + "/" + p[1] + "/" + String(p[2]).slice(-2); }
 function heureNow() { var d = new Date(), m = d.getMinutes(); return d.getHours() + " h " + (m < 10 ? "0" + m : m); }
 function noteRep(q, i, ok) {
   if (!cur.rep) { cur.rep = []; }
@@ -1736,13 +1740,34 @@ function noteRep(q, i, ok) {
 function logExercice(e) {
   if (!state.log) { state.log = []; }
   state.log.push(e);
-  if (state.log.length > LOG_MAX) { state.log = state.log.slice(state.log.length - LOG_MAX); }
+  state.log = rogneLog(state.log);
 }
+var LOG_QUIZ_MAX = 30;
+function rogneLog(arr) {
+  var q = 0, o = 0, i, keep = [];
+  for (i = arr.length - 1; i >= 0; i--) {
+    if (arr[i].k === "quiz") { if (q < LOG_QUIZ_MAX) { q++; keep.push(arr[i]); } }
+    else if (o < LOG_MAX) { o++; keep.push(arr[i]); }
+  }
+  keep.reverse();
+  return keep;
+}
+function carteQuizFaits() {
+  var lg = state.log || [], h = "", n = 0, i;
+  for (i = lg.length - 1; i >= 0; i--) {
+    if (lg[i].k !== "quiz") { continue; }
+    n++;
+    h += '<details class="ex"><summary>' + esc(dateLisible(lg[i].d)) + (lg[i].h ? " à " + esc(lg[i].h) : "") + ' · ' + lg[i].ok + '/' + lg[i].n + '</summary>' + detailExercice(lg[i]) + '</details>';
+  }
+  if (!n) { return '<details class="repli"><summary>📋 Quiz faits : questions et réponses</summary><p class="petit">Les quiz faits apparaîtront ici, avec les questions et les réponses.</p></details>'; }
+  return '<details class="repli"><summary>📋 Quiz faits : questions et réponses (' + n + ')</summary><p class="petit">Du plus récent au plus ancien. Touche un quiz pour voir chaque question et la réponse.</p>' + h + '</details>';
+}
+
 function ligneRep(x) {
   return '<div class="rep">' + (x.ok ? "✅" : "❌") + ' <strong>' + esc(x.q) + '</strong><br><span class="petit">Réponse de Vanessa : ' + esc(x.r) + (x.ok ? "" : ' · Bonne réponse : ' + esc(x.b)) + '</span></div>';
 }
 function detailExerciceTout(e) {
-  var h = '<div class="petit">' + esc(e.d) + (e.h ? " à " + esc(e.h) : "") + ' · ' + e.ok + ' bonne' + (e.ok > 1 ? "s" : "") + ' réponse' + (e.ok > 1 ? "s" : "") + ' sur ' + e.n + ' (note ' + e.s + '/10)</div>';
+  var h = '<div class="petit">📅 ' + esc(dateLisible(e.d)) + (e.h ? " à " + esc(e.h) : "") + ' · ' + e.ok + ' bonne' + (e.ok > 1 ? "s" : "") + ' réponse' + (e.ok > 1 ? "s" : "") + ' sur ' + e.n + ' (note ' + e.s + '/10)</div>';
   for (var i = 0; i < (e.qs || []).length; i++) { h += ligneRep(e.qs[i]); }
   if (e.w && String(e.w).replace(/\s+/g, "")) { h += '<div class="rep">✏️ <strong>' + esc(e.qe || "Réponse écrite") + '</strong><br><span class="petit">Réponse de Vanessa : ' + esc(e.w) + '</span></div>'; }
   return h;
@@ -1758,7 +1783,7 @@ function cartesJournal() {
   h += '<div class="carte"><h2>📋 Dernier exercice</h2>';
   if (lg.length) {
     var d = lg[lg.length - 1];
-    h += '<p><strong>' + esc(d.t) + '</strong></p>' + detailExercice(d, true);
+    h += '<p><strong>' + esc(d.t) + '</strong><br>📅 ' + esc(dateLisible(d.d)) + (d.h ? ' à ' + esc(d.h) : '') + '</p>' + detailExercice(d, true);
   } else { h += '<p class="petit">Pas encore d\'exercice enregistré en détail. Le prochain apparaîtra ici.</p>'; }
   h += '</div>';
   var ex = 0, nq = 0, nw = 0, somme = 0, jours = {}, k;
@@ -1782,32 +1807,33 @@ function carteDetailStats() {
   for (i = 0; i < lg.length; i++) {
     var e = lg[i], key = e.t;
     if (!agg[key]) { agg[key] = { ok: 0, n: 0, fois: 0 }; ordre.push(key); }
+    agg[key].dern = e.d;
     agg[key].ok += e.ok || 0; agg[key].n += e.n || 0; agg[key].fois++;
   }
   h += '<details class="carte repli"><summary>🧮 Détail par exercice</summary>';
   if (!ordre.length) { h += '<p class="petit">Le détail apparaîtra après le prochain exercice.</p>'; }
   for (i = ordre.length - 1; i >= 0; i--) {
     var a = agg[ordre[i]], p = a.n ? Math.round(a.ok / a.n * 100) : 0;
-    h += '<div class="rep">' + '<strong>' + esc(ordre[i]) + '</strong>' + '<br><span class="petit">' + a.fois + ' fois · ' + a.ok + ' bonnes réponses sur ' + a.n + ' · ' + p + ' %</span></div>';
+    h += '<div class="rep">' + '<strong>' + esc(ordre[i]) + '</strong>' + '<br><span class="petit">' + a.fois + ' fois · ' + a.ok + ' bonnes réponses sur ' + a.n + ' · ' + p + ' % · dernier : ' + esc(dateLisible(a.dern)) + '</span></div>';
   }
   h += '</details>';
   for (i = lg.length - 1; i >= 0 && rev.length < 15; i--) {
     for (j = (lg[i].qs || []).length - 1; j >= 0 && rev.length < 15; j--) {
       var x = lg[i].qs[j];
-      if (!x.ok && !vus[x.q]) { vus[x.q] = 1; rev.push(x); }
+      if (!x.ok && !vus[x.q]) { vus[x.q] = 1; x.dt = lg[i].d; rev.push(x); }
     }
   }
   h += '<details class="carte repli"><summary>🔁 Questions à revoir</summary>';
   if (!rev.length) { h += '<p class="petit">Aucune question ratée dans les derniers exercices. Bravo !</p>'; }
-  else { h += '<p class="petit">Les questions ratées récemment, avec la bonne réponse.</p>'; for (i = 0; i < rev.length; i++) { h += '<div class="rep">❌ ' + '<strong>' + esc(rev[i].q) + '</strong>' + '<br><span class="petit">Bonne réponse : ' + esc(rev[i].b) + '</span></div>'; } }
+  else { h += '<p class="petit">Les questions ratées récemment, avec la bonne réponse.</p>'; for (i = 0; i < rev.length; i++) { h += '<div class="rep">❌ ' + '<strong>' + esc(rev[i].q) + '</strong>' + '<br><span class="petit">Bonne réponse : ' + esc(rev[i].b) + (rev[i].dt ? ' · ' + esc(dateLisible(rev[i].dt)) : '') + '</span></div>'; } }
   return h + '</details>';
 }
 function carteJournalListe() {
-  var lg = state.log || [], h = '<details class="carte repli"><summary>🗂️ Journal des exercices</summary>';
+  var lg = (state.log || []).filter(function (x) { return x.k !== "quiz"; }), h = '<details class="carte repli"><summary>🗂️ Journal des exercices</summary>';
   if (!lg.length) { return h + '<p class="petit">Le journal se remplit à chaque exercice.</p></details>'; }
   h += '<p class="petit">Les ' + LOG_MAX + ' derniers exercices, du plus récent au plus ancien. Touche un exercice pour voir les questions et les réponses.</p>';
   for (var i = lg.length - 1; i >= 0; i--) {
-    h += '<details class="ex"><summary>' + esc(lg[i].d) + ' · ' + esc(lg[i].t) + ' · ' + lg[i].ok + '/' + lg[i].n + '</summary>' + detailExercice(lg[i]) + '</details>';
+    h += '<details class="ex"><summary>' + esc(dateLisible(lg[i].d)) + ' · ' + esc(lg[i].t) + ' · ' + lg[i].ok + '/' + lg[i].n + '</summary>' + detailExercice(lg[i]) + '</details>';
   }
   return h + '</details>';
 }
@@ -1843,6 +1869,7 @@ function showProgression() {
   h += '<p class="petit">' + (state.quiz.total || 0) + ' quiz faits · ' + state.quiz.streak + ' jour(s) de suite</p>';
   var sq = statsPour("quiz");
   if (sq.n > 0) { h += '<p><strong>Moyenne ' + fmt(sq.moy) + '/10</strong></p>'; }
+  h += carteQuizFaits();
   h += '<button class="bouton second" id="b-plan">Voir mon plan de quiz</button></div>';
   h += '<details class="carte repli"><summary>📚 Mes matières</summary>';
   var any = false;
