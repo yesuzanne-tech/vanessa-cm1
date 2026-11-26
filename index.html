@@ -1115,6 +1115,7 @@ function bind(id, fn) {
   if (el) { el.addEventListener("click", fn); }
 }
 function go(html) {
+  document.body.className = (document.body.className || "").replace(/\s*clavier-ouvert/g, "");
   app.innerHTML = html;
   window.scrollTo(0, 0);
 }
@@ -2064,6 +2065,16 @@ function showMot() {
   bind("b-ret", function () { stopVoix(); showDicteeGroupe(dm.mi, dm.ti, dm.gi); });
   var inp = document.getElementById("mot-in");
   var verifie = false;
+  /* Le clavier de l'iPad ne doit pas cacher la zone d'écriture : place en bas et zone remontée (le bouton Écouter reste visible) */
+  function remonteMot() {
+    document.body.className = (document.body.className || "") + " clavier-ouvert";
+    window.setTimeout(function () {
+      var y = inp.getBoundingClientRect().top + (window.pageYOffset || 0) - 170;
+      window.scrollTo(0, y < 0 ? 0 : y);
+    }, 350);
+  }
+  inp.addEventListener("focus", remonteMot, false);
+  inp.addEventListener("blur", function () { document.body.className = (document.body.className || "").replace(/\s*clavier-ouvert/g, ""); }, false);
   bind("b-verif", function () {
     if (verifie) { return; }
     var rep = normMot(inp.value);
@@ -2125,7 +2136,12 @@ function showDicteeTexte(mi, ti, gi, texte) {
   bind("b-ec", function () { parler(phrases[i], msg, 0.75); });
   bind("b-sui", function () { if (i < phrases.length - 1) { i++; maj(); parler(phrases[i], msg, 0.75); } else { msg.textContent = "C'est la dernière phrase."; } });
   bind("b-pre", function () { if (i > 0) { i--; maj(); parler(phrases[i], msg, 0.75); } });
-  bind("b-voir", function () { document.getElementById("d-txt").innerHTML = '<div class="texte-histoire">' + esc(texte) + '</div>'; });
+  var texteVisible = false;
+  bind("b-voir", function () {
+    texteVisible = !texteVisible;
+    document.getElementById("d-txt").innerHTML = texteVisible ? '<div class="texte-histoire">' + esc(texte) + '</div>' : "";
+    document.getElementById("b-voir").textContent = texteVisible ? "Cacher le texte" : "Voir le texte pour me corriger";
+  });
   bind("b-ret", function () { stopVoix(); showDicteeGroupe(mi, ti, gi); });
 }
 
