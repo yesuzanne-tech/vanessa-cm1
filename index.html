@@ -1494,6 +1494,7 @@ function finishEx() {
       qz.last = isoToday();
     }
     qz.total = (qz.total || 0) + 1;
+    if (ctx.kind === "quiz") { if (qz.mois !== isoToday().slice(0, 7)) { qz.mois = isoToday().slice(0, 7); qz.nm = 0; } qz.nm = (qz.nm || 0) + 1; }
     if (ctx.kind === "quiz" && state.plan) {
       if (!state.plan.res) { state.plan.res = []; }
       state.plan.res[state.plan.done || 0] = cur.correct + "/" + ex.qs.length;
@@ -1837,6 +1838,7 @@ function showProgression() {
   }
   h += '</div>';
   h += '<div class="carte quiz"><h2>🔥 Quiz du jour</h2>';
+  h += '<p><strong>🎯 Quiz du mois :</strong> ' + ((state.quiz.mois === isoToday().slice(0, 7)) ? (state.quiz.nm || 0) : 0) + ' sur 30</p>';
   h += '<p class="petit">' + (state.quiz.total || 0) + ' quiz faits · ' + state.quiz.streak + ' jour(s) de suite</p>';
   var sq = statsPour("quiz");
   if (sq.n > 0) { h += '<p><strong>Moyenne ' + fmt(sq.moy) + '/10</strong></p>'; }
